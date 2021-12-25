@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{b8ea53e9-fa99-4d16-bc85-cddf81f362cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine">
+      <UniqueIdentifier>{aa381baf-bcdb-45a2-b6d1-8d1f98e7f8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\GraphicsEngine">
+      <UniqueIdentifier>{39640df3-dbef-414e-88af-01bc5ec21256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\WindowingSystem">
+      <UniqueIdentifier>{a9f86dce-ff1e-45be-a98d-8affb194b27d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\GraphicsEngine\SwapChain">
+      <UniqueIdentifier>{77e4979f-c10b-4aeb-abd9-a2040cf6ab63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pch">
+      <UniqueIdentifier>{b4c2df3d-c151-4e14-888c-2ea1fab37088}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>pch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppWindow.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>GameEngine\WindowingSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwapChain.cpp">
+      <Filter>GameEngine\GraphicsEngine\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine.cpp">
+      <Filter>GameEngine\GraphicsEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\pch.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AppWindow.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>GameEngine\WindowingSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwapChain.h">
+      <Filter>GameEngine\GraphicsEngine\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsEngine.h">
+      <Filter>GameEngine\GraphicsEngine</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
