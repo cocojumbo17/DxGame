@@ -4,6 +4,7 @@
 class SwapChain;
 class VertexBuffer;
 class VertexShader;
+class PixelShader;
 
 class AppWindow :
     public Window
@@ -17,5 +18,6 @@ protected:
     SwapChain* mp_swap_chain;
     VertexBuffer* mp_vb;
     VertexShader* mp_vs;
+    PixelShader* mp_ps;
 };
 

@@ -3,6 +3,7 @@
 #include "SwapChain.h"
 #include "VertexBuffer.h"
 #include "VertexShader.h"
+#include "PixelShader.h"
 
 DeviceContext::DeviceContext(ID3D11DeviceContext* ctx)
 	: mp_imm_ctx(ctx)
@@ -39,6 +40,11 @@ void DeviceContext::SetVertexBuffer(VertexBuffer* p_vertex_buffer)
 void DeviceContext::SetVertexShader(VertexShader* p_vertex_shader)
 {
 	mp_imm_ctx->VSSetShader(p_vertex_shader->mp_vs, nullptr, 0);
+}
+
+void DeviceContext::SetPixelShader(PixelShader* p_pixel_shader)
+{
+	mp_imm_ctx->PSSetShader(p_pixel_shader->mp_ps, nullptr, 0);
 }
 
 void DeviceContext::DrawTriangleList(UINT vertex_number, UINT start_vertex_index)

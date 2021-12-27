@@ -4,6 +4,8 @@
 #include "DeviceContext.h"
 #include "VertexBuffer.h"
 #include "VertexShader.h"
+#include "PixelShader.h"
+
 #include <d3dcompiler.h>
 
 
@@ -11,9 +13,7 @@ GraphicsEngine::GraphicsEngine()
 	: mp_d3d_device(nullptr)
 	, mp_ctx(nullptr)
 	, mp_dx_factory(nullptr)
-	, mp_ps_blob(nullptr)
 	, mp_blob(nullptr)
-	, mp_ps(nullptr)
 {
 }
 
@@ -61,8 +61,6 @@ bool GraphicsEngine::Init()
 
 bool GraphicsEngine::Release()
 {
-	SAFE_RELEASE(mp_ps);
-	SAFE_RELEASE(mp_ps_blob);
 	SAFE_RELEASE(mp_dx_factory);
 	SAFE_RELEASE(mp_ctx);
 	SAFE_RELEASE(mp_d3d_device);
@@ -98,7 +96,36 @@ VertexShader* GraphicsEngine::CreateVertexShader(const void* p_shader_bytecode, 
 
 bool GraphicsEngine::CompileVertexShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size)
 {
-	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "vs_5_0", 0, 0, &mp_blob, nullptr);
+	ID3DBlob* errblob;
+	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "vs_5_0", 0, 0, &mp_blob, &errblob);
+	if (SUCCEEDED(hr))
+	{
+		*pp_shader_bytecode = mp_blob->GetBufferPointer();
+		shader_size = mp_blob->GetBufferSize();
+		return true;
+	}
+	else
+	{
+		void* err = errblob->GetBufferPointer();
+		SAFE_RELEASE(errblob);
+	}
+	return false;
+}
+
+PixelShader* GraphicsEngine::CreatePixelShader(const void* p_shader_bytecode, size_t shader_size)
+{
+	PixelShader* p_ps = new PixelShader();
+	if (!p_ps->Init(p_shader_bytecode, shader_size))
+	{
+		delete p_ps;
+		return nullptr;
+	}
+	return p_ps;
+}
+
+bool GraphicsEngine::CompilePixelShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size)
+{
+	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "ps_5_0", 0, 0, &mp_blob, nullptr);
 	if (SUCCEEDED(hr))
 	{
 		*pp_shader_bytecode = mp_blob->GetBufferPointer();
@@ -107,6 +134,7 @@ bool GraphicsEngine::CompileVertexShader(const wchar_t* shader_file, const char*
 	}
 	return false;
 }
+
 
 void GraphicsEngine::ReleaseCompiledShader()
 {
@@ -118,19 +146,3 @@ DeviceContext* GraphicsEngine::GetDeviceContext()
 	return mp_ctx;
 }
 
-bool GraphicsEngine::CreateShaders()
-{
-	HRESULT hr = D3DCompileFromFile(L"shader.fx", nullptr, nullptr, "psmain", "ps_5_0", 0, 0, &mp_ps_blob, nullptr);
-	if (SUCCEEDED(hr))
-	{
-		hr = mp_d3d_device->CreatePixelShader(mp_ps_blob->GetBufferPointer(), mp_ps_blob->GetBufferSize(), nullptr, &mp_ps);
-		if (FAILED(hr))
-			return false;
-	}
-	return mp_ps;
-}
-
-void GraphicsEngine::SetShaders()
-{
-	mp_imm_ctx->PSSetShader(mp_ps, nullptr, 0);
-}

@@ -4,6 +4,7 @@ class SwapChain;
 class DeviceContext;
 class VertexBuffer;
 class VertexShader;
+class PixelShader;
 
 class GraphicsEngine
 {
@@ -17,13 +18,15 @@ public:
 	
 	bool CompileVertexShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size);
 	VertexShader* CreateVertexShader(const void* p_shader_bytecode, size_t shader_size);
+
+	bool CompilePixelShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size);
+	PixelShader* CreatePixelShader(const void* p_shader_bytecode, size_t shader_size);
+
 	void ReleaseCompiledShader();
 
 
 	DeviceContext* GetDeviceContext();
 
-	bool CreateShaders();
-	void SetShaders();
 private:
 	GraphicsEngine();
 protected:
@@ -32,12 +35,12 @@ protected:
 	IDXGIFactory* mp_dx_factory;
 	DeviceContext* mp_ctx;
 	ID3D11DeviceContext* mp_imm_ctx;
+
 	ID3DBlob* mp_blob;
 
-	ID3DBlob* mp_ps_blob;
-	ID3D11PixelShader* mp_ps;
 	friend class SwapChain;
 	friend class VertexBuffer;
 	friend class VertexShader;
+	friend class PixelShader;
 };
 
