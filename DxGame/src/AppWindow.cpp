@@ -34,11 +34,16 @@ void AppWindow::OnCreate()
 
 	mp_vb = GraphicsEngine::Instance()->CreateVertexBuffer();
 	GraphicsEngine::Instance()->CreateShaders();
-	void* p_shader_bytecode = nullptr;
-	unsigned int shader_size = 0;
-	GraphicsEngine::Instance()->GetShadersBytecodeAndSize(&p_shader_bytecode, &shader_size);
-	mp_vb->Load(v, vertex_size, list_size, p_shader_bytecode, shader_size);
 
+
+	void* p_shader_bytecode = nullptr;
+	size_t shader_size = 0;
+	if (GraphicsEngine::Instance()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
+	{
+		mp_vs = GraphicsEngine::Instance()->CreateVertexShader(p_shader_bytecode, shader_size);
+	}
+	mp_vb->Load(v, vertex_size, list_size, p_shader_bytecode, shader_size);
+	GraphicsEngine::Instance()->ReleaseCompiledShader();
 }
 
 void AppWindow::OnDestroy()
@@ -55,6 +60,7 @@ void AppWindow::OnUpdate()
 	RECT rc = GetClientWindowRect();
 	GraphicsEngine::Instance()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
 	GraphicsEngine::Instance()->SetShaders();
+	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexShader(mp_vs);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexBuffer(mp_vb);
 	GraphicsEngine::Instance()->GetDeviceContext()->DrawTriangleStrip(mp_vb->GetListSize(), 0);
 

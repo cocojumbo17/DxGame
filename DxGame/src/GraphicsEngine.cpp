@@ -3,6 +3,7 @@
 #include "SwapChain.h"
 #include "DeviceContext.h"
 #include "VertexBuffer.h"
+#include "VertexShader.h"
 #include <d3dcompiler.h>
 
 
@@ -10,9 +11,8 @@ GraphicsEngine::GraphicsEngine()
 	: mp_d3d_device(nullptr)
 	, mp_ctx(nullptr)
 	, mp_dx_factory(nullptr)
-	, mp_vs_blob(nullptr)
 	, mp_ps_blob(nullptr)
-	, mp_vs(nullptr)
+	, mp_blob(nullptr)
 	, mp_ps(nullptr)
 {
 }
@@ -61,9 +61,7 @@ bool GraphicsEngine::Init()
 
 bool GraphicsEngine::Release()
 {
-	SAFE_RELEASE(mp_vs);
 	SAFE_RELEASE(mp_ps);
-	SAFE_RELEASE(mp_vs_blob);
 	SAFE_RELEASE(mp_ps_blob);
 	SAFE_RELEASE(mp_dx_factory);
 	SAFE_RELEASE(mp_ctx);
@@ -87,6 +85,34 @@ VertexBuffer* GraphicsEngine::CreateVertexBuffer()
 	return new VertexBuffer();
 }
 
+VertexShader* GraphicsEngine::CreateVertexShader(const void* p_shader_bytecode, size_t shader_size)
+{
+	VertexShader* p_vs = new VertexShader();
+	if (!p_vs->Init(p_shader_bytecode, shader_size))
+	{
+		delete p_vs;
+		return nullptr;
+	}
+	return p_vs;
+}
+
+bool GraphicsEngine::CompileVertexShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size)
+{
+	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "vs_5_0", 0, 0, &mp_blob, nullptr);
+	if (SUCCEEDED(hr))
+	{
+		*pp_shader_bytecode = mp_blob->GetBufferPointer();
+		shader_size = mp_blob->GetBufferSize();
+		return true;
+	}
+	return false;
+}
+
+void GraphicsEngine::ReleaseCompiledShader()
+{
+	SAFE_RELEASE(mp_blob);
+}
+
 DeviceContext* GraphicsEngine::GetDeviceContext()
 {
 	return mp_ctx;
@@ -94,32 +120,17 @@ DeviceContext* GraphicsEngine::GetDeviceContext()
 
 bool GraphicsEngine::CreateShaders()
 {
-	HRESULT hr = D3DCompileFromFile(L"shader.fx",nullptr, nullptr, "vsmain", "vs_5_0", 0, 0, &mp_vs_blob, nullptr);
-	if (SUCCEEDED(hr))
-	{
-		hr = mp_d3d_device->CreateVertexShader(mp_vs_blob->GetBufferPointer(), mp_vs_blob->GetBufferSize(), nullptr, &mp_vs);
-		if (FAILED(hr))
-			return false;
-	}
-	hr = D3DCompileFromFile(L"shader.fx", nullptr, nullptr, "psmain", "ps_5_0", 0, 0, &mp_ps_blob, nullptr);
+	HRESULT hr = D3DCompileFromFile(L"shader.fx", nullptr, nullptr, "psmain", "ps_5_0", 0, 0, &mp_ps_blob, nullptr);
 	if (SUCCEEDED(hr))
 	{
 		hr = mp_d3d_device->CreatePixelShader(mp_ps_blob->GetBufferPointer(), mp_ps_blob->GetBufferSize(), nullptr, &mp_ps);
 		if (FAILED(hr))
 			return false;
 	}
-	return mp_vs && mp_ps;
+	return mp_ps;
 }
 
 void GraphicsEngine::SetShaders()
 {
-	mp_imm_ctx->VSSetShader(mp_vs, nullptr, 0);
 	mp_imm_ctx->PSSetShader(mp_ps, nullptr, 0);
 }
-
-void GraphicsEngine::GetShadersBytecodeAndSize(void** pp_shader_bytecode, unsigned int* p_shader_size)
-{
-	*pp_shader_bytecode = mp_vs_blob->GetBufferPointer();
-	*p_shader_size = mp_vs_blob->GetBufferSize();
-}
-
