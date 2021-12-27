@@ -32,13 +32,13 @@ bool Window::Release()
 bool Window::Broadcast()
 {
 	MSG msg{ 0 };
+	OnUpdate();
 	while (::PeekMessage(&msg, m_hwnd, 0, 0, PM_REMOVE) > 0)
 	{
 		::TranslateMessage(&msg);
 		::DispatchMessage(&msg);
 	}
-	OnUpdate();
-	Sleep(0);
+	Sleep(1);
 	return true;
 }
 
@@ -85,7 +85,7 @@ bool Window::RegisterWin()
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(wcex);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.style = 0;// CS_HREDRAW | CS_VREDRAW;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);

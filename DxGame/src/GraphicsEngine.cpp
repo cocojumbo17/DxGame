@@ -1,13 +1,19 @@
 #include "pch.h"
 #include "GraphicsEngine.h"
 #include "SwapChain.h"
-
+#include "DeviceContext.h"
+#include "VertexBuffer.h"
+#include <d3dcompiler.h>
 
 
 GraphicsEngine::GraphicsEngine()
-	: mp_device(nullptr)
-	, mp_imm_ctx(nullptr)
+	: mp_d3d_device(nullptr)
+	, mp_ctx(nullptr)
 	, mp_dx_factory(nullptr)
+	, mp_vs_blob(nullptr)
+	, mp_ps_blob(nullptr)
+	, mp_vs(nullptr)
+	, mp_ps(nullptr)
 {
 }
 
@@ -29,17 +35,19 @@ bool GraphicsEngine::Init()
 	HRESULT res = 0;
 	for (int driver_index = 0; driver_index < ARRAYSIZE(driver_types); ++driver_index)
 	{
-		res = D3D11CreateDevice(nullptr, driver_types[driver_index], NULL, 0, feature_levels, ARRAYSIZE(feature_levels), D3D11_SDK_VERSION, &mp_device, &m_feature_level, &mp_imm_ctx);
+		res = D3D11CreateDevice(nullptr, driver_types[driver_index], NULL, 0, feature_levels, ARRAYSIZE(feature_levels), D3D11_SDK_VERSION, &mp_d3d_device, &m_feature_level, &mp_imm_ctx);
 		if (SUCCEEDED(res))
 			break;
 	}
 	if (FAILED(res))
 		return false;
 
+	mp_ctx = new DeviceContext(mp_imm_ctx);
+
 	IDXGIDevice* p_device = nullptr;
 	IDXGIAdapter* p_adapter = nullptr;
 	
-	if (SUCCEEDED(mp_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&p_device)))
+	if (SUCCEEDED(mp_d3d_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&p_device)))
 	{
 		if (SUCCEEDED(p_device->GetParent(__uuidof(IDXGIAdapter), (void**)&p_adapter)))
 		{
@@ -53,9 +61,13 @@ bool GraphicsEngine::Init()
 
 bool GraphicsEngine::Release()
 {
-	SAFE_RELEASE(mp_dx_factory)
-	SAFE_RELEASE(mp_imm_ctx);
-	SAFE_RELEASE(mp_device);
+	SAFE_RELEASE(mp_vs);
+	SAFE_RELEASE(mp_ps);
+	SAFE_RELEASE(mp_vs_blob);
+	SAFE_RELEASE(mp_ps_blob);
+	SAFE_RELEASE(mp_dx_factory);
+	SAFE_RELEASE(mp_ctx);
+	SAFE_RELEASE(mp_d3d_device);
 	return true;
 }
 
@@ -68,5 +80,46 @@ GraphicsEngine* GraphicsEngine::Instance()
 SwapChain* GraphicsEngine::CreateSwapChain()
 {
 	return new SwapChain();
+}
+
+VertexBuffer* GraphicsEngine::CreateVertexBuffer()
+{
+	return new VertexBuffer();
+}
+
+DeviceContext* GraphicsEngine::GetDeviceContext()
+{
+	return mp_ctx;
+}
+
+bool GraphicsEngine::CreateShaders()
+{
+	HRESULT hr = D3DCompileFromFile(L"shader.fx",nullptr, nullptr, "vsmain", "vs_5_0", 0, 0, &mp_vs_blob, nullptr);
+	if (SUCCEEDED(hr))
+	{
+		hr = mp_d3d_device->CreateVertexShader(mp_vs_blob->GetBufferPointer(), mp_vs_blob->GetBufferSize(), nullptr, &mp_vs);
+		if (FAILED(hr))
+			return false;
+	}
+	hr = D3DCompileFromFile(L"shader.fx", nullptr, nullptr, "psmain", "ps_5_0", 0, 0, &mp_ps_blob, nullptr);
+	if (SUCCEEDED(hr))
+	{
+		hr = mp_d3d_device->CreatePixelShader(mp_ps_blob->GetBufferPointer(), mp_ps_blob->GetBufferSize(), nullptr, &mp_ps);
+		if (FAILED(hr))
+			return false;
+	}
+	return mp_vs && mp_ps;
+}
+
+void GraphicsEngine::SetShaders()
+{
+	mp_imm_ctx->VSSetShader(mp_vs, nullptr, 0);
+	mp_imm_ctx->PSSetShader(mp_ps, nullptr, 0);
+}
+
+void GraphicsEngine::GetShadersBytecodeAndSize(void** pp_shader_bytecode, unsigned int* p_shader_size)
+{
+	*pp_shader_bytecode = mp_vs_blob->GetBufferPointer();
+	*p_shader_size = mp_vs_blob->GetBufferSize();
 }
 

@@ -2,6 +2,7 @@
 #include "Window.h"
 
 class SwapChain;
+class VertexBuffer;
 
 class AppWindow :
     public Window
@@ -13,5 +14,6 @@ public:
     virtual void OnUpdate() override;
 protected:
     SwapChain* mp_swap_chain;
+    VertexBuffer* mp_vb;
 };
 
