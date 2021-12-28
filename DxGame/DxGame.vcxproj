@@ -102,10 +102,12 @@
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\GraphicsEngine.h" />
+    <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Matrix4x4.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\PixelShader.h" />
     <ClInclude Include="src\SwapChain.h" />
+    <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Vector3d.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexShader.h" />
@@ -116,11 +118,13 @@
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\GraphicsEngine.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Matrix4x4.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\PixelShader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
+    <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Vector3d.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexShader.cpp" />

@@ -32,6 +32,7 @@ struct constant
 
 void AppWindow::OnCreate()
 {
+	Logger::PrintLog(L"AppWindow::OnCreate");
 	GraphicsEngine::Instance()->Init();
 	mp_swap_chain = GraphicsEngine::Instance()->CreateSwapChain();
 	RECT rc = GetClientWindowRect();
@@ -79,6 +80,7 @@ void AppWindow::OnDestroy()
 	mp_swap_chain->Release();
 	GraphicsEngine::Instance()->Release();
 	Window::OnDestroy();
+	Logger::PrintLog(L"AppWindow::OnDestroy");
 }
 
 void AppWindow::OnUpdate()

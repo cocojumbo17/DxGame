@@ -112,7 +112,12 @@ bool GraphicsEngine::CompileVertexShader(const wchar_t* shader_file, const char*
 	}
 	else
 	{
-		void* err = errblob->GetBufferPointer();
+		size_t len = errblob->GetBufferSize();
+		char* err = (char*)errblob->GetBufferPointer();
+		wchar_t* w_err = new wchar_t[len];
+		mbstowcs_s(nullptr, w_err, len, err, len);
+		Logger::PrintLog(L"[ERROR] CompilePixelShader: %s", w_err);
+		delete[]w_err;
 		SAFE_RELEASE(errblob);
 	}
 	return false;
@@ -131,12 +136,23 @@ PixelShader* GraphicsEngine::CreatePixelShader(const void* p_shader_bytecode, si
 
 bool GraphicsEngine::CompilePixelShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size)
 {
-	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "ps_5_0", 0, 0, &mp_blob, nullptr);
+	ID3DBlob* errblob;
+	HRESULT hr = D3DCompileFromFile(shader_file, nullptr, nullptr, entry_point_name, "ps_5_0", 0, 0, &mp_blob, &errblob);
 	if (SUCCEEDED(hr))
 	{
 		*pp_shader_bytecode = mp_blob->GetBufferPointer();
 		shader_size = mp_blob->GetBufferSize();
 		return true;
+	}
+	else
+	{
+		size_t len = errblob->GetBufferSize();
+		char* err = (char*)errblob->GetBufferPointer();
+		wchar_t* w_err = new wchar_t[len];
+		mbstowcs_s(nullptr, w_err, len, err, len);
+		Logger::PrintLog(L"[ERROR] CompilePixelShader: %s", w_err);
+		delete[]w_err;
+		SAFE_RELEASE(errblob);
 	}
 	return false;
 }
