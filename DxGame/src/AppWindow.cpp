@@ -7,24 +7,26 @@
 #include "ConstantBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "Vector3d.h"
+#include "Matrix4x4.h"
+#include <math.h>
 
-struct vec3
-{
-	float x, y, z;
-};
 
 struct vertex
 {
-	vec3 pos;
-	vec3 pos1;
-	vec3 color;
-	vec3 color1;
+	Vector3d pos;
+	Vector3d pos1;
+	Vector3d color;
+	Vector3d color1;
 };
 
 __declspec(align(16))
 struct constant
 {
-	unsigned int time;
+	Matrix4x4 m_world;
+	Matrix4x4 m_view;
+	Matrix4x4 m_proj;
+	unsigned int m_time;
 };
 
 
@@ -36,10 +38,10 @@ void AppWindow::OnCreate()
 	mp_swap_chain->Init(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 	vertex v[] = {
-		{-0.5f, -0.5f, 0.0f,	-0.55f, -0.55f, 0.0f,	0,0,1,	1,1,0},
-		{-0.5f, 0.5f, 0.0f,		-0.55f, 0.55f, 0.0f,	0,0,0,	1,1,1},
-		{0.5f, -0.5f, 0.0f,		0.55f, -0.55f, 0.0f,	1,1,1,	0,0,0},
-		{0.5f, 0.5f, 0.0f,		0.75f, 0.75f, 0.0f,		1,1,0,	0,0,1}
+		{Vector3d(-0.5f, -0.5f, 0.0f),	Vector3d(-0.55f, -0.55f, 0.0f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
+		{Vector3d(-0.5f, 0.5f, 0.0f),	Vector3d(-0.55f, 0.55f, 0.0f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
+		{Vector3d(0.5f, -0.5f, 0.0f),	Vector3d(0.55f, -0.55f, 0.0f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
+		{Vector3d(0.5f, 0.5f, 0.0f),	Vector3d(0.75f, 0.75f, 0.0f),	Vector3d(1,1,0),	Vector3d(0,0,1)}
 	};
 	UINT vertex_size = sizeof(vertex);
 	UINT list_size = ARRAYSIZE(v);
@@ -47,7 +49,7 @@ void AppWindow::OnCreate()
 	mp_vb = GraphicsEngine::Instance()->CreateVertexBuffer();
 
 	mp_cb = GraphicsEngine::Instance()->CreateConstantBuffer();
-	constant cc{0};
+	constant cc;
 	mp_cb->Load(&cc, sizeof(cc));
 
 	void* p_shader_bytecode = nullptr;
@@ -64,6 +66,8 @@ void AppWindow::OnCreate()
 		mp_ps = GraphicsEngine::Instance()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->ReleaseCompiledShader();
+
+	m_delta_pos = 0;
 }
 
 void AppWindow::OnDestroy()
@@ -79,17 +83,17 @@ void AppWindow::OnDestroy()
 
 void AppWindow::OnUpdate()
 {
-	GraphicsEngine::Instance()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.0f, 0.3f, 0.4f, 1);
+	GraphicsEngine::Instance()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.08f, 0.08f, 0.08f, 1);
 	RECT rc = GetClientWindowRect();
 	GraphicsEngine::Instance()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
-	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexShader(mp_vs);
 
-	constant cc{ ::GetTickCount()};
-	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
+	UpdateQuadPosition();
+
 	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferVS(mp_cb);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferPS(mp_cb);
 
 
+	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexShader(mp_vs);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetPixelShader(mp_ps);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexBuffer(mp_vb);
 
@@ -97,4 +101,30 @@ void AppWindow::OnUpdate()
 	GraphicsEngine::Instance()->GetDeviceContext()->DrawTriangleStrip((UINT)mp_vb->GetListSize(), 0);
 
 	mp_swap_chain->Present(false);
+}
+
+void AppWindow::UpdateQuadPosition()
+{
+	RECT rc = GetClientWindowRect();
+	constant cc;
+	cc.m_time = ::GetTickCount();
+	float delta_time = (cc.m_time - m_prev_time) / 1000.0f;
+	m_prev_time = cc.m_time;
+	m_delta_pos += delta_time / 5.0f;
+	if (m_delta_pos > 1.0f)
+		m_delta_pos = 0;
+
+	m_delta_scale += delta_time * 10.0f;
+	if (m_delta_scale > 2*3.1415926f)
+		m_delta_scale = 0.0f;
+	Matrix4x4 trans, scale;
+	trans.SetTranslation(Vector3d::lerp(Vector3d(-1, -1, 0), Vector3d(1, 1, 0), m_delta_pos));
+	scale.SetScale(Vector3d::lerp(Vector3d(0.5f, 0.5f, 1.0f), Vector3d(1.0f, 1.0f, 1.0f), (float)(sin(m_delta_scale)+1.0f)/2.0f));
+	
+	cc.m_world = scale;
+	cc.m_world *= trans;
+	
+	cc.m_view.SetIdentity();
+	cc.m_proj.SetOrthoLH((rc.right - rc.left)/400.0f, (rc.bottom - rc.top)/400.0f, -4.0f, 4.0f);
+	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
 }

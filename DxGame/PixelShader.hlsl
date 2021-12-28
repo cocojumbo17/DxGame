@@ -5,11 +5,13 @@ struct PS_INPUT {
 };
 
 cbuffer constant: register(b0) {
-	unsigned int time;
+	row_major float4x4 m_world;
+	row_major float4x4 m_view;
+	row_major float4x4 m_proj;
+	unsigned int m_time;
 };
-
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	return float4(lerp(input.color, input.color1, (sin(time / 500.0) + 1.0) / 2.0), 1.0f);
+	return float4(lerp(input.color, input.color1, (sin(m_time / 500.0) + 1.0) / 2.0), 1.0f);
 }

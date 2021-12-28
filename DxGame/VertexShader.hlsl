@@ -12,13 +12,18 @@ struct VS_OUTPUT {
 };
 
 cbuffer constant: register(b0){
-	unsigned int time;
+	row_major float4x4 m_world;
+	row_major float4x4 m_view;
+	row_major float4x4 m_proj;
+	unsigned int m_time;
 };
 
 VS_OUTPUT vsmain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
-	output.pos = lerp(input.pos, input.pos1, (sin(time / 1000.0) + 1.0) / 2.0);
+	output.pos = mul(input.pos, m_world);
+	output.pos = mul(output.pos, m_view);
+	output.pos = mul(output.pos, m_proj);
 	output.color = input.color;
 	output.color1 = input.color1;
 

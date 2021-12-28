@@ -61,6 +61,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -68,7 +70,7 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy *.hlsl $(OutDir)</Command>
+      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -81,6 +83,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,7 +94,7 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy *.hlsl $(OutDir)</Command>
+      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -98,13 +102,14 @@
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\GraphicsEngine.h" />
+    <ClInclude Include="src\Matrix4x4.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\PixelShader.h" />
     <ClInclude Include="src\SwapChain.h" />
+    <ClInclude Include="src\Vector3d.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexShader.h" />
     <ClInclude Include="src\Window.h" />
-    <ClInclude Include="Vector3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppWindow.cpp" />
@@ -112,13 +117,14 @@
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\GraphicsEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Matrix4x4.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\PixelShader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
+    <ClCompile Include="src\Vector3d.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexShader.cpp" />
     <ClCompile Include="src\Window.cpp" />
-    <ClCompile Include="Vector3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
