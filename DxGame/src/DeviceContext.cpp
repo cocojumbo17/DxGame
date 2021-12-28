@@ -2,6 +2,7 @@
 #include "DeviceContext.h"
 #include "SwapChain.h"
 #include "VertexBuffer.h"
+#include "ConstantBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
 
@@ -31,10 +32,20 @@ void DeviceContext::ClearRenderTargetColor(SwapChain* p_swap_chain, float r, flo
 
 void DeviceContext::SetVertexBuffer(VertexBuffer* p_vertex_buffer)
 {
-	UINT strides[] = { p_vertex_buffer->m_vertex_size };
+	UINT strides[] = { (UINT)p_vertex_buffer->m_vertex_size };
 	UINT offsets[] = { 0 };
 	mp_imm_ctx->IASetVertexBuffers(0, 1, &p_vertex_buffer->mp_vertex_buffer, strides, offsets);
 	mp_imm_ctx->IASetInputLayout(p_vertex_buffer->mp_input_layout);
+}
+
+void DeviceContext::SetConstantBufferVS(ConstantBuffer* p_constant_buffer)
+{
+	mp_imm_ctx->VSSetConstantBuffers(0, 1, &p_constant_buffer->mp_buffer);
+}
+
+void DeviceContext::SetConstantBufferPS(ConstantBuffer* p_constant_buffer)
+{
+	mp_imm_ctx->PSSetConstantBuffers(0, 1, &p_constant_buffer->mp_buffer);
 }
 
 void DeviceContext::SetVertexShader(VertexShader* p_vertex_shader)

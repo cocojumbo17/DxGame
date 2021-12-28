@@ -68,7 +68,7 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy src\\shader.fx $(OutDir)</Command>
+      <Command>xcopy *.hlsl $(OutDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -90,11 +90,12 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy src\\shader.fx $(OutDir)</Command>
+      <Command>xcopy *.hlsl $(OutDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\AppWindow.h" />
+    <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\GraphicsEngine.h" />
     <ClInclude Include="src\pch.h" />
@@ -103,9 +104,11 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexShader.h" />
     <ClInclude Include="src\Window.h" />
+    <ClInclude Include="Vector3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppWindow.cpp" />
+    <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\GraphicsEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -115,15 +118,12 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexShader.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="Vector3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="src\shader.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

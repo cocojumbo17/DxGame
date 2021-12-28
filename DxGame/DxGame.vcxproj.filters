@@ -31,6 +31,12 @@
     <Filter Include="GameEngine\GraphicsEngine\PixelShader">
       <UniqueIdentifier>{69dbf2da-ddb7-4801-be42-4d7987fc346f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameEngine\GraphicsEngine\ConstantBuffer">
+      <UniqueIdentifier>{0487ea4b-d69d-4e16-8f36-7edf0b20cca7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\Math">
+      <UniqueIdentifier>{d710b099-b3fd-4047-a2bf-1bc8456fe5f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">
@@ -63,6 +69,10 @@
     <ClCompile Include="src\PixelShader.cpp">
       <Filter>GameEngine\GraphicsEngine\PixelShader</Filter>
     </ClCompile>
+    <ClCompile Include="src\ConstantBuffer.cpp">
+      <Filter>GameEngine\GraphicsEngine\ConstantBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -92,11 +102,12 @@
     <ClInclude Include="src\PixelShader.h">
       <Filter>GameEngine\GraphicsEngine\PixelShader</Filter>
     </ClInclude>
+    <ClInclude Include="src\ConstantBuffer.h">
+      <Filter>GameEngine\GraphicsEngine\ConstantBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3d.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\shader.fx">
-      <Filter>App</Filter>
-    </FxCompile>
     <FxCompile Include="VertexShader.hlsl">
       <Filter>App</Filter>
     </FxCompile>

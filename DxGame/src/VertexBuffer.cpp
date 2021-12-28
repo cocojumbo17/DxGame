@@ -15,7 +15,7 @@ VertexBuffer::~VertexBuffer()
 {
 }
 
-bool VertexBuffer::Load(void* vertex_list, unsigned int vertex_size, unsigned int list_size, const void* p_shader_bytecode, int shader_size)
+bool VertexBuffer::Load(void* vertex_list, size_t vertex_size, size_t list_size, const void* p_shader_bytecode, size_t shader_size)
 {
 
     SAFE_RELEASE(mp_input_layout);
@@ -24,7 +24,7 @@ bool VertexBuffer::Load(void* vertex_list, unsigned int vertex_size, unsigned in
 
     D3D11_BUFFER_DESC buf_desc = { 0 };
     buf_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    buf_desc.ByteWidth = vertex_size * list_size;
+    buf_desc.ByteWidth = (UINT)(vertex_size * list_size);
     buf_desc.CPUAccessFlags = 0;
     buf_desc.MiscFlags = 0;
     buf_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -41,7 +41,9 @@ bool VertexBuffer::Load(void* vertex_list, unsigned int vertex_size, unsigned in
 
     D3D11_INPUT_ELEMENT_DESC element_descs[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"POSITION", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
     hr = GraphicsEngine::Instance()->mp_d3d_device->CreateInputLayout(element_descs, ARRAYSIZE(element_descs), p_shader_bytecode, shader_size, &mp_input_layout);
     if (FAILED(hr))
@@ -58,7 +60,7 @@ bool VertexBuffer::Release()
     return true;
 }
 
-unsigned int VertexBuffer::GetListSize()
+size_t VertexBuffer::GetListSize()
 {
     return m_list_size;
 }
