@@ -5,7 +5,6 @@
 
 Matrix4x4::Matrix4x4()
 {
-	SetIdentity();
 }
 
 void Matrix4x4::SetIdentity()
@@ -31,6 +30,39 @@ void Matrix4x4::SetScale(const Vector3d& scale)
 	m_matrix[0][0] = scale.m_x;
 	m_matrix[1][1] = scale.m_y;
 	m_matrix[2][2] = scale.m_z;
+}
+
+void Matrix4x4::SetRotationX(float angle)
+{
+	SetIdentity();
+	float c = cos(angle);
+	float s = sin(angle);
+	m_matrix[1][1] = c;
+	m_matrix[2][2] = c;
+	m_matrix[1][2] = s;
+	m_matrix[2][1] = -s;
+}
+
+void Matrix4x4::SetRotationY(float angle)
+{
+	SetIdentity();
+	float c = cos(angle);
+	float s = sin(angle);
+	m_matrix[0][0] = c;
+	m_matrix[2][2] = c;
+	m_matrix[0][2] = -s;
+	m_matrix[2][0] = s;
+}
+
+void Matrix4x4::SetRotationZ(float angle)
+{
+	SetIdentity();
+	float c = cos(angle);
+	float s = sin(angle);
+	m_matrix[0][0] = c;
+	m_matrix[1][1] = c;
+	m_matrix[0][1] = s;
+	m_matrix[1][0] = -s;
 }
 
 void Matrix4x4::SetOrthoLH(float width, float height, float near_plane, float far_plane)

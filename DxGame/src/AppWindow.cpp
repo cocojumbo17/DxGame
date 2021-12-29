@@ -4,6 +4,7 @@
 #include "SwapChain.h"
 #include "DeviceContext.h"
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
@@ -15,10 +16,9 @@
 struct vertex
 {
 	Vector3d pos;
-	Vector3d pos1;
 	Vector3d color;
 	Vector3d color1;
-};
+}; 
 
 __declspec(align(16))
 struct constant
@@ -39,16 +39,39 @@ void AppWindow::OnCreate()
 	mp_swap_chain->Init(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 	vertex v[] = {
-		{Vector3d(-0.5f, -0.5f, 0.0f),	Vector3d(-0.55f, -0.55f, 0.0f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
-		{Vector3d(-0.5f, 0.5f, 0.0f),	Vector3d(-0.55f, 0.55f, 0.0f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
-		{Vector3d(0.5f, -0.5f, 0.0f),	Vector3d(0.55f, -0.55f, 0.0f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
-		{Vector3d(0.5f, 0.5f, 0.0f),	Vector3d(0.75f, 0.75f, 0.0f),	Vector3d(1,1,0),	Vector3d(0,0,1)}
+		{Vector3d(-0.5f, -0.5f, 0.5f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
+		{Vector3d(-0.5f, 0.5f, 0.5f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
+		{Vector3d(0.5f, -0.5f, 0.5f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
+		{Vector3d(0.5f, 0.5f, 0.5f),	Vector3d(1,1,0),	Vector3d(0,0,1)},
+		{Vector3d(-0.5f, -0.5f, -0.5f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
+		{Vector3d(-0.5f, 0.5f, -0.5f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
+		{Vector3d(0.5f, -0.5f, -0.5f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
+		{Vector3d(0.5f, 0.5f, -0.5f),	Vector3d(1,1,0),	Vector3d(0,0,1)}
+
 	};
 	UINT vertex_size = sizeof(vertex);
 	UINT list_size = ARRAYSIZE(v);
 
 	mp_vb = GraphicsEngine::Instance()->CreateVertexBuffer();
 
+
+	int indixes[] = {
+		0,1,2,
+		1,3,2,
+		6,7,4,
+		7,5,4,
+		1,5,3,
+		5,7,3,
+		4,0,6,
+		0,2,6,
+		2,3,6,
+		3,7,6,
+		4,5,0,
+		5,1,0
+	};
+	mp_ib = GraphicsEngine::Instance()->CreateIndexBuffer();
+	mp_ib->Load(indixes, ARRAYSIZE(indixes));
+	
 	mp_cb = GraphicsEngine::Instance()->CreateConstantBuffer();
 	constant cc;
 	mp_cb->Load(&cc, sizeof(cc));
@@ -74,9 +97,10 @@ void AppWindow::OnCreate()
 void AppWindow::OnDestroy()
 {
 	mp_cb->Release();
+	mp_ib->Release();
+	mp_vb->Release();
 	mp_vs->Release();
 	mp_ps->Release();
-	mp_vb->Release();
 	mp_swap_chain->Release();
 	GraphicsEngine::Instance()->Release();
 	Window::OnDestroy();
@@ -98,11 +122,12 @@ void AppWindow::OnUpdate()
 	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexShader(mp_vs);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetPixelShader(mp_ps);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexBuffer(mp_vb);
+	GraphicsEngine::Instance()->GetDeviceContext()->SetIndexBuffer(mp_ib);
 
 
-	GraphicsEngine::Instance()->GetDeviceContext()->DrawTriangleStrip((UINT)mp_vb->GetListSize(), 0);
+	GraphicsEngine::Instance()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_ib->GetListSize(), 0, 0);
 
-	mp_swap_chain->Present(false);
+	mp_swap_chain->Present(true);
 }
 
 void AppWindow::UpdateQuadPosition()
@@ -116,17 +141,26 @@ void AppWindow::UpdateQuadPosition()
 	if (m_delta_pos > 1.0f)
 		m_delta_pos = 0;
 
-	m_delta_scale += delta_time * 10.0f;
+	m_delta_scale += delta_time * 1.0f;
 	if (m_delta_scale > 2*3.1415926f)
 		m_delta_scale = 0.0f;
-	Matrix4x4 trans, scale;
-	trans.SetTranslation(Vector3d::lerp(Vector3d(-1, -1, 0), Vector3d(1, 1, 0), m_delta_pos));
-	scale.SetScale(Vector3d::lerp(Vector3d(0.5f, 0.5f, 1.0f), Vector3d(1.0f, 1.0f, 1.0f), (float)(sin(m_delta_scale)+1.0f)/2.0f));
+	//Matrix4x4 trans, scale;
+	//trans.SetTranslation(Vector3d::lerp(Vector3d(-1, -1, 0), Vector3d(1, 1, 0), m_delta_pos));
+	//scale.SetScale(Vector3d::lerp(Vector3d(0.5f, 0.5f, 1.0f), Vector3d(1.0f, 1.0f, 1.0f), (float)(sin(m_delta_scale)+1.0f)/2.0f));
 	
-	cc.m_world = scale;
-	cc.m_world *= trans;
+	//cc.m_world = scale;
+	//cc.m_world *= trans;
 	
+	Matrix4x4 rx, ry, rz;
+	rx.SetRotationX(m_delta_scale);
+	ry.SetRotationY(m_delta_scale);
+	rz.SetRotationZ(m_delta_scale);
+
+	cc.m_world = rx;
+	cc.m_world *= ry;
+	cc.m_world *= rz;
+
 	cc.m_view.SetIdentity();
-	cc.m_proj.SetOrthoLH((rc.right - rc.left)/400.0f, (rc.bottom - rc.top)/400.0f, -4.0f, 4.0f);
+	cc.m_proj.SetOrthoLH((rc.right - rc.left)/300.0f, (rc.bottom - rc.top)/300.0f, -4.0f, 4.0f);
 	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
 }

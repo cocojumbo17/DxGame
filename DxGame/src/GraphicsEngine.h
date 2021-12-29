@@ -3,6 +3,7 @@
 class SwapChain;
 class DeviceContext;
 class VertexBuffer;
+class IndexBuffer;
 class VertexShader;
 class PixelShader;
 class ConstantBuffer;
@@ -16,6 +17,7 @@ public:
 	static GraphicsEngine* Instance();
 	SwapChain* CreateSwapChain();
 	VertexBuffer* CreateVertexBuffer();
+	IndexBuffer* CreateIndexBuffer();
 	ConstantBuffer* CreateConstantBuffer();
 
 	bool CompileVertexShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size);
@@ -42,6 +44,7 @@ protected:
 
 	friend class SwapChain;
 	friend class VertexBuffer;
+	friend class IndexBuffer;
 	friend class VertexShader;
 	friend class PixelShader;
 	friend class ConstantBuffer;

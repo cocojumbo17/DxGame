@@ -3,6 +3,7 @@
 
 class SwapChain;
 class VertexBuffer;
+class IndexBuffer;
 class ConstantBuffer;
 class VertexShader;
 class PixelShader;
@@ -20,6 +21,7 @@ protected:
 protected:
     SwapChain* mp_swap_chain;
     VertexBuffer* mp_vb;
+    IndexBuffer* mp_ib;
     ConstantBuffer* mp_cb;
     VertexShader* mp_vs;
     PixelShader* mp_ps;
