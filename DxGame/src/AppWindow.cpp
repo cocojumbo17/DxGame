@@ -11,7 +11,7 @@
 #include "Vector3d.h"
 #include "Matrix4x4.h"
 #include <math.h>
-
+#include "InputSystem.h"
 
 struct vertex
 {
@@ -33,6 +33,7 @@ struct constant
 void AppWindow::OnCreate()
 {
 	Logger::PrintLog(L"AppWindow::OnCreate");
+	InputSystem::Instance()->AddListener(this);
 	GraphicsEngine::Instance()->Init();
 	mp_swap_chain = GraphicsEngine::Instance()->CreateSwapChain();
 	RECT rc = GetClientWindowRect();
@@ -59,7 +60,7 @@ void AppWindow::OnCreate()
 		0,1,2,
 		1,3,2,
 		6,7,4,
-		7,5,4,
+		4,7,5,
 		1,5,3,
 		5,7,3,
 		4,0,6,
@@ -96,6 +97,7 @@ void AppWindow::OnCreate()
 
 void AppWindow::OnDestroy()
 {
+	InputSystem::Instance()->RemoveListener(this);
 	mp_cb->Release();
 	mp_ib->Release();
 	mp_vb->Release();
@@ -109,7 +111,8 @@ void AppWindow::OnDestroy()
 
 void AppWindow::OnUpdate()
 {
-	GraphicsEngine::Instance()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.08f, 0.08f, 0.08f, 1);
+	InputSystem::Instance()->Update();
+	GraphicsEngine::Instance()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.28f, 0.28f, 0.28f, 1);
 	RECT rc = GetClientWindowRect();
 	GraphicsEngine::Instance()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
 
@@ -135,15 +138,15 @@ void AppWindow::UpdateQuadPosition()
 	RECT rc = GetClientWindowRect();
 	constant cc;
 	cc.m_time = ::GetTickCount();
-	float delta_time = (cc.m_time - m_prev_time) / 1000.0f;
+	m_delta_time = (cc.m_time - m_prev_time) / 1000.0f;
 	m_prev_time = cc.m_time;
-	m_delta_pos += delta_time / 5.0f;
-	if (m_delta_pos > 1.0f)
-		m_delta_pos = 0;
+	//m_delta_pos += m_delta_time / 5.0f;
+	//if (m_delta_pos > 1.0f)
+	//	m_delta_pos = 0;
 
-	m_delta_scale += delta_time * 1.0f;
-	if (m_delta_scale > 2*3.1415926f)
-		m_delta_scale = 0.0f;
+	//m_delta_scale += m_delta_time * 1.0f;
+	//if (m_delta_scale > 2*3.1415926f)
+	//	m_delta_scale = 0.0f;
 	//Matrix4x4 trans, scale;
 	//trans.SetTranslation(Vector3d::lerp(Vector3d(-1, -1, 0), Vector3d(1, 1, 0), m_delta_pos));
 	//scale.SetScale(Vector3d::lerp(Vector3d(0.5f, 0.5f, 1.0f), Vector3d(1.0f, 1.0f, 1.0f), (float)(sin(m_delta_scale)+1.0f)/2.0f));
@@ -152,15 +155,35 @@ void AppWindow::UpdateQuadPosition()
 	//cc.m_world *= trans;
 	
 	Matrix4x4 rx, ry, rz;
-	rx.SetRotationX(m_delta_scale);
-	ry.SetRotationY(m_delta_scale);
-	rz.SetRotationZ(m_delta_scale);
+	rx.SetRotationX(m_rot_x);
+	ry.SetRotationY(m_rot_y);
 
 	cc.m_world = rx;
 	cc.m_world *= ry;
-	cc.m_world *= rz;
 
 	cc.m_view.SetIdentity();
 	cc.m_proj.SetOrthoLH((rc.right - rc.left)/300.0f, (rc.bottom - rc.top)/300.0f, -4.0f, 4.0f);
 	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
+}
+
+void AppWindow::OnKeyDown(byte key)
+{
+	switch (std::toupper(key)) {
+		case 'A':
+			m_rot_y -= m_delta_time;
+			break;
+		case 'D':
+			m_rot_y += m_delta_time;
+			break;
+		case 'S':
+			m_rot_x += m_delta_time;
+			break;
+		case 'W':
+			m_rot_x -= m_delta_time;
+			break;
+	}
+}
+
+void AppWindow::OnKeyUp(byte key)
+{
 }

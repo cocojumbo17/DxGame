@@ -70,8 +70,12 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -94,15 +98,21 @@
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy *.hlsl $(OutDir) /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\AppWindow.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\GraphicsEngine.h" />
+    <ClInclude Include="src\IInputListener.h" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Matrix4x4.h" />
     <ClInclude Include="src\pch.h" />
@@ -120,6 +130,7 @@
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\GraphicsEngine.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Matrix4x4.cpp" />

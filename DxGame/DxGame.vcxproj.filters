@@ -43,6 +43,12 @@
     <Filter Include="GameEngine\GraphicsEngine\Buffers\ConstantBuffer">
       <UniqueIdentifier>{0487ea4b-d69d-4e16-8f36-7edf0b20cca7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameEngine\Log">
+      <UniqueIdentifier>{5f4d8156-4b43-49be-88ef-12808ff8d6a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine\InputSystem">
+      <UniqueIdentifier>{5fb9d3a8-8d03-4d08-b1bd-6594ee82f6b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">
@@ -84,14 +90,17 @@
     <ClCompile Include="src\Matrix4x4.cpp">
       <Filter>GameEngine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Time.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
     <ClCompile Include="src\IndexBuffer.cpp">
       <Filter>GameEngine\GraphicsEngine\Buffers\IndexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>GameEngine\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time.cpp">
+      <Filter>GameEngine\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputSystem.cpp">
+      <Filter>GameEngine\InputSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,14 +140,20 @@
     <ClInclude Include="src\Matrix4x4.h">
       <Filter>GameEngine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logger.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Time.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
     <ClInclude Include="src\IndexBuffer.h">
       <Filter>GameEngine\GraphicsEngine\Buffers\IndexBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logger.h">
+      <Filter>GameEngine\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Time.h">
+      <Filter>GameEngine\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IInputListener.h">
+      <Filter>GameEngine\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputSystem.h">
+      <Filter>GameEngine\InputSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
