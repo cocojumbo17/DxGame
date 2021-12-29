@@ -102,6 +102,9 @@
     <ClCompile Include="src\InputSystem.cpp">
       <Filter>GameEngine\InputSystem</Filter>
     </ClCompile>
+    <ClCompile Include="src\Point2d.cpp">
+      <Filter>GameEngine\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -154,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="src\InputSystem.h">
       <Filter>GameEngine\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Point2d.h">
+      <Filter>GameEngine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

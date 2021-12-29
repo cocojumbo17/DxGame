@@ -16,19 +16,27 @@ void InputSystem::Notify(byte key, bool is_down)
 	for (auto l : m_listeners)
 	{
 		if (is_down)
-			l->OnKeyDown(key);
+		{
+			if (key == VK_LBUTTON)
+				l->OnMouseLKeyDown(m_cur_mouse_pos);
+			else if (key == VK_RBUTTON)
+				l->OnMouseRKeyDown(m_cur_mouse_pos);
+			else
+				l->OnKeyDown(key);
+		}
 		else
-			l->OnKeyUp(key);
+		{
+			if (key == VK_LBUTTON)
+				l->OnMouseLKeyUp(m_cur_mouse_pos);
+			else if (key == VK_RBUTTON)
+				l->OnMouseRKeyUp(m_cur_mouse_pos);
+			else
+				l->OnKeyUp(key);
+		}
 	}
 }
 
-InputSystem* InputSystem::Instance()
-{
-	static InputSystem inst;
-	return &inst;
-}
-
-void InputSystem::Update()
+void InputSystem::KeyboardHandle()
 {
 	if (::GetKeyboardState(m_key_status))
 	{
@@ -44,8 +52,39 @@ void InputSystem::Update()
 			}
 			++i;
 		}
+		memcpy(m_old_key_status, m_key_status, ARRAYSIZE(m_key_status));
 	}
-	memcpy(m_old_key_status, m_key_status, ARRAYSIZE(m_key_status));
+}
+
+void InputSystem::MouseHandle()
+{
+	POINT pt;
+	if (::GetCursorPos(&pt))
+	{
+		m_cur_mouse_pos.m_x = pt.x;
+		m_cur_mouse_pos.m_y = pt.y;
+
+		if (m_cur_mouse_pos != m_old_mouse_pos)
+		{
+			for (auto l : m_listeners)
+			{
+				l->OnMouseMove(m_cur_mouse_pos - m_old_mouse_pos);
+			}
+		}
+	}
+	m_old_mouse_pos = m_cur_mouse_pos;
+}
+
+InputSystem* InputSystem::Instance()
+{
+	static InputSystem inst;
+	return &inst;
+}
+
+void InputSystem::Update()
+{
+	MouseHandle();
+	KeyboardHandle();
 }
 
 void InputSystem::AddListener(IInputListener* p_listener)

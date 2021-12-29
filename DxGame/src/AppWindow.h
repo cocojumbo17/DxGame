@@ -15,16 +15,27 @@ class AppWindow :
     public IInputListener
 {
 public:
+    AppWindow();
+    virtual ~AppWindow();
+protected:
+    void UpdateQuadPosition();
+
     // Inherited via Window
     virtual void OnCreate() override;
     virtual void OnDestroy() override;
     virtual void OnUpdate() override;
-protected:
-    void UpdateQuadPosition();
+    virtual void OnSetFocus() override;
+    virtual void OnKillFocus() override;
 
     // Inherited via IInputListener
     virtual void OnKeyDown(byte key) override;
     virtual void OnKeyUp(byte key) override;
+    virtual void OnMouseMove(const Point2d& offset) override;
+    virtual void OnMouseLKeyDown(const Point2d& pos) override;
+    virtual void OnMouseLKeyUp(const Point2d& pos) override;
+    virtual void OnMouseRKeyDown(const Point2d& pos) override;
+    virtual void OnMouseRKeyUp(const Point2d& pos) override;
+
 protected:
     SwapChain* mp_swap_chain;
     VertexBuffer* mp_vb;
@@ -33,10 +44,11 @@ protected:
     VertexShader* mp_vs;
     PixelShader* mp_ps;
     unsigned int m_prev_time;
-    float m_delta_pos;
-    float m_delta_scale;
     float m_delta_time;
     float m_rot_x;
     float m_rot_y;
+    bool m_is_lbutton_pressed;
+    bool m_is_rbutton_pressed;
+    float m_scale;
 };
 

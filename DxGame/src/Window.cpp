@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Window.h"
 
-Window* temp_win_obj;
-
 Window::Window()
     :m_is_run(false)
 {
@@ -14,7 +12,6 @@ Window::~Window()
 
 bool Window::Init()
 {
-	temp_win_obj = this;
     if (!RegisterWin())
         return false;
     if (!CreateWin())
@@ -64,17 +61,35 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	switch (msg) 
 	{
 	case WM_CREATE:
-		if (temp_win_obj)
-		{
-			temp_win_obj->SetHWND(hwnd);
-			temp_win_obj->OnCreate();
-		}
+	{
+		Window* p_wnd = (Window*)((CREATESTRUCT*)lparam)->lpCreateParams;
+		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)p_wnd);
+		p_wnd->SetHWND(hwnd);
+		p_wnd->OnCreate();
 		break;
+	}
 	case WM_DESTROY:
-		if (temp_win_obj)
-			temp_win_obj->OnDestroy();
+	{
+		Window* p_wnd = (Window*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (p_wnd)
+			p_wnd->OnDestroy();
 		::PostQuitMessage(0);
 		break;
+	}
+	case WM_SETFOCUS:
+	{
+		Window* p_wnd = (Window*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (p_wnd)
+			p_wnd->OnSetFocus();
+		break;
+	}
+	case WM_KILLFOCUS:
+	{
+		Window* p_wnd = (Window*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (p_wnd)
+			p_wnd->OnKillFocus();
+		break;
+	}
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}
@@ -106,7 +121,7 @@ void Window::OnDestroy()
 
 bool Window::CreateWin()
 {
-	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, nullptr, nullptr);
+	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, nullptr, this);
 
 	if (!m_hwnd)
 		return false;

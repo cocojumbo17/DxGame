@@ -29,11 +29,22 @@ struct constant
 	unsigned int m_time;
 };
 
+AppWindow::AppWindow()
+	: m_is_lbutton_pressed(false)
+	, m_is_rbutton_pressed(false)
+	, m_scale(1.0f)
+{
+	Logger::PrintLog(L"AppWindow::AppWindow");
+}
+
+AppWindow::~AppWindow()
+{
+	Logger::PrintLog(L"AppWindow::~AppWindow");
+}
 
 void AppWindow::OnCreate()
 {
 	Logger::PrintLog(L"AppWindow::OnCreate");
-	InputSystem::Instance()->AddListener(this);
 	GraphicsEngine::Instance()->Init();
 	mp_swap_chain = GraphicsEngine::Instance()->CreateSwapChain();
 	RECT rc = GetClientWindowRect();
@@ -91,13 +102,10 @@ void AppWindow::OnCreate()
 		mp_ps = GraphicsEngine::Instance()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->ReleaseCompiledShader();
-
-	m_delta_pos = 0;
 }
 
 void AppWindow::OnDestroy()
 {
-	InputSystem::Instance()->RemoveListener(this);
 	mp_cb->Release();
 	mp_ib->Release();
 	mp_vb->Release();
@@ -140,25 +148,13 @@ void AppWindow::UpdateQuadPosition()
 	cc.m_time = ::GetTickCount();
 	m_delta_time = (cc.m_time - m_prev_time) / 1000.0f;
 	m_prev_time = cc.m_time;
-	//m_delta_pos += m_delta_time / 5.0f;
-	//if (m_delta_pos > 1.0f)
-	//	m_delta_pos = 0;
-
-	//m_delta_scale += m_delta_time * 1.0f;
-	//if (m_delta_scale > 2*3.1415926f)
-	//	m_delta_scale = 0.0f;
-	//Matrix4x4 trans, scale;
-	//trans.SetTranslation(Vector3d::lerp(Vector3d(-1, -1, 0), Vector3d(1, 1, 0), m_delta_pos));
-	//scale.SetScale(Vector3d::lerp(Vector3d(0.5f, 0.5f, 1.0f), Vector3d(1.0f, 1.0f, 1.0f), (float)(sin(m_delta_scale)+1.0f)/2.0f));
-	
-	//cc.m_world = scale;
-	//cc.m_world *= trans;
 	
 	Matrix4x4 rx, ry, rz;
 	rx.SetRotationX(m_rot_x);
 	ry.SetRotationY(m_rot_y);
 
-	cc.m_world = rx;
+	cc.m_world.SetScale(Vector3d(m_scale, m_scale, m_scale));
+	cc.m_world *= rx;
 	cc.m_world *= ry;
 
 	cc.m_view.SetIdentity();
@@ -186,4 +182,47 @@ void AppWindow::OnKeyDown(byte key)
 
 void AppWindow::OnKeyUp(byte key)
 {
+}
+
+void AppWindow::OnMouseMove(const Point2d& offset)
+{
+	if (m_is_lbutton_pressed)
+	{
+		m_rot_x += offset.m_y * m_delta_time;
+		m_rot_y += offset.m_x * m_delta_time;
+	}
+	if (m_is_rbutton_pressed)
+	{
+		m_scale -= offset.m_y * m_delta_time;
+	}
+}
+
+void AppWindow::OnMouseLKeyDown(const Point2d& pos)
+{
+	m_is_lbutton_pressed = true;
+}
+
+void AppWindow::OnMouseLKeyUp(const Point2d& pos)
+{
+	m_is_lbutton_pressed = false;
+}
+
+void AppWindow::OnMouseRKeyDown(const Point2d& pos)
+{
+	m_is_rbutton_pressed = true;
+}
+
+void AppWindow::OnMouseRKeyUp(const Point2d& pos)
+{
+	m_is_rbutton_pressed = false;
+}
+
+void AppWindow::OnSetFocus()
+{
+	InputSystem::Instance()->AddListener(this);
+}
+
+void AppWindow::OnKillFocus()
+{
+	InputSystem::Instance()->RemoveListener(this);
 }
