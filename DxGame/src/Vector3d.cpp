@@ -30,3 +30,13 @@ Vector3d Vector3d::lerp(const Vector3d& start, const Vector3d& stop, float part)
 	res.m_z = start.m_z * (1.0f - part) + stop.m_z * part;
 	return res;
 }
+
+Vector3d Vector3d::operator+(const Vector3d other) const
+{
+	return Vector3d(m_x + other.m_x, m_y + other.m_y, m_z + other.m_z);
+}
+
+Vector3d Vector3d::operator*(float s) const
+{
+	return Vector3d(m_x * s, m_y * s, m_z * s);
+}

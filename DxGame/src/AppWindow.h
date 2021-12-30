@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "IInputListener.h"
+#include "Matrix4x4.h"
 
 class SwapChain;
 class VertexBuffer;
@@ -18,7 +19,7 @@ public:
     AppWindow();
     virtual ~AppWindow();
 protected:
-    void UpdateQuadPosition();
+    void Update();
 
     // Inherited via Window
     virtual void OnCreate() override;
@@ -50,5 +51,8 @@ protected:
     bool m_is_lbutton_pressed;
     bool m_is_rbutton_pressed;
     float m_scale;
+    float m_forward;
+    float m_rightward;
+    Matrix4x4 m_camera_matrix;
 };
 

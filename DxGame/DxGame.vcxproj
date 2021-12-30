@@ -121,6 +121,7 @@
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Vector3d.h" />
+    <ClInclude Include="src\Vector4d.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexShader.h" />
     <ClInclude Include="src\Window.h" />
@@ -141,6 +142,7 @@
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Vector3d.cpp" />
+    <ClCompile Include="src\Vector4d.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexShader.cpp" />
     <ClCompile Include="src\Window.cpp" />

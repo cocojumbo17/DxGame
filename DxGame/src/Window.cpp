@@ -121,7 +121,7 @@ void Window::OnDestroy()
 
 bool Window::CreateWin()
 {
-	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, nullptr, this);
+	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, nullptr, nullptr, nullptr, this);
 
 	if (!m_hwnd)
 		return false;

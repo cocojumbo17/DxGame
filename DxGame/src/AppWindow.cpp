@@ -33,6 +33,8 @@ AppWindow::AppWindow()
 	: m_is_lbutton_pressed(false)
 	, m_is_rbutton_pressed(false)
 	, m_scale(1.0f)
+	, m_forward(0.0f)
+	, m_rightward(0.0f)
 {
 	Logger::PrintLog(L"AppWindow::AppWindow");
 }
@@ -51,14 +53,14 @@ void AppWindow::OnCreate()
 	mp_swap_chain->Init(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 	vertex v[] = {
-		{Vector3d(-0.5f, -0.5f, 0.5f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
-		{Vector3d(-0.5f, 0.5f, 0.5f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
-		{Vector3d(0.5f, -0.5f, 0.5f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
-		{Vector3d(0.5f, 0.5f, 0.5f),	Vector3d(1,1,0),	Vector3d(0,0,1)},
-		{Vector3d(-0.5f, -0.5f, -0.5f),	Vector3d(0,0,1),	Vector3d(1,1,0)},
-		{Vector3d(-0.5f, 0.5f, -0.5f),	Vector3d(1,0,0),	Vector3d(0,0,0)},
-		{Vector3d(0.5f, -0.5f, -0.5f),	Vector3d(0,0,0),	Vector3d(1,0,0)},
-		{Vector3d(0.5f, 0.5f, -0.5f),	Vector3d(1,1,0),	Vector3d(0,0,1)}
+		{Vector3d(-0.5f, -0.5f, 0.5f),	Vector3d(0,0,1),	Vector3d(0,0,1)},
+		{Vector3d(-0.5f, 0.5f, 0.5f),	Vector3d(1,0,0),	Vector3d(1,0,0)},
+		{Vector3d(0.5f, -0.5f, 0.5f),	Vector3d(0,0,0),	Vector3d(0,0,0)},
+		{Vector3d(0.5f, 0.5f, 0.5f),	Vector3d(1,1,0),	Vector3d(1,1,0)},
+		{Vector3d(-0.5f, -0.5f, -0.5f),	Vector3d(0,0,1),	Vector3d(0,0,1)},
+		{Vector3d(-0.5f, 0.5f, -0.5f),	Vector3d(1,0,0),	Vector3d(1,0,0)},
+		{Vector3d(0.5f, -0.5f, -0.5f),	Vector3d(0,0,0),	Vector3d(0,0,0)},
+		{Vector3d(0.5f, 0.5f, -0.5f),	Vector3d(1,1,0),	Vector3d(1,1,0)}
 
 	};
 	UINT vertex_size = sizeof(vertex);
@@ -102,6 +104,8 @@ void AppWindow::OnCreate()
 		mp_ps = GraphicsEngine::Instance()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->ReleaseCompiledShader();
+	m_camera_matrix.SetTranslation(Vector3d(0,0,-2.0f));
+	InputSystem::Instance()->ShowCursor(false);
 }
 
 void AppWindow::OnDestroy()
@@ -124,7 +128,7 @@ void AppWindow::OnUpdate()
 	RECT rc = GetClientWindowRect();
 	GraphicsEngine::Instance()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
 
-	UpdateQuadPosition();
+	Update();
 
 	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferVS(mp_cb);
 	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferPS(mp_cb);
@@ -141,7 +145,7 @@ void AppWindow::OnUpdate()
 	mp_swap_chain->Present(true);
 }
 
-void AppWindow::UpdateQuadPosition()
+void AppWindow::Update()
 {
 	RECT rc = GetClientWindowRect();
 	constant cc;
@@ -149,16 +153,28 @@ void AppWindow::UpdateQuadPosition()
 	m_delta_time = (cc.m_time - m_prev_time) / 1000.0f;
 	m_prev_time = cc.m_time;
 	
-	Matrix4x4 rx, ry, rz;
-	rx.SetRotationX(m_rot_x);
-	ry.SetRotationY(m_rot_y);
 
-	cc.m_world.SetScale(Vector3d(m_scale, m_scale, m_scale));
-	cc.m_world *= rx;
-	cc.m_world *= ry;
 
-	cc.m_view.SetIdentity();
-	cc.m_proj.SetOrthoLH((rc.right - rc.left)/300.0f, (rc.bottom - rc.top)/300.0f, -4.0f, 4.0f);
+	Matrix4x4 camera_matrix, temp;
+	camera_matrix.SetRotationX(m_rot_x);
+
+	temp.SetRotationY(m_rot_y);
+	camera_matrix *= temp;
+
+	Vector3d new_camera_pos = m_camera_matrix.GetTranslation() + camera_matrix.GetZDirection() * m_forward*0.1f;
+	new_camera_pos = new_camera_pos + camera_matrix.GetXDirection() * m_rightward * 0.1f;
+
+	camera_matrix.SetTranslation(new_camera_pos);
+
+	m_camera_matrix = camera_matrix;
+	
+	camera_matrix.Inverse();
+	cc.m_view = camera_matrix;
+
+	int width = rc.right - rc.left;
+	int height = rc.bottom - rc.top;
+//	cc.m_proj.SetOrthoLH(width/300.0f, height/300.0f, -4.0f, 4.0f);
+	cc.m_proj.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
 	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
 }
 
@@ -166,30 +182,32 @@ void AppWindow::OnKeyDown(byte key)
 {
 	switch (std::toupper(key)) {
 		case 'A':
-			m_rot_y -= m_delta_time;
+			m_rightward = -1.0f;
 			break;
 		case 'D':
-			m_rot_y += m_delta_time;
+			m_rightward = 1.0f;
 			break;
 		case 'S':
-			m_rot_x += m_delta_time;
+			m_forward = -1.0f;
 			break;
 		case 'W':
-			m_rot_x -= m_delta_time;
+			m_forward = 1.0f;
 			break;
 	}
 }
 
 void AppWindow::OnKeyUp(byte key)
 {
+	m_forward = 0.0f;
+	m_rightward = 0.0f;
 }
 
 void AppWindow::OnMouseMove(const Point2d& offset)
 {
 	if (m_is_lbutton_pressed)
 	{
-		m_rot_x += offset.m_y * m_delta_time;
-		m_rot_y += offset.m_x * m_delta_time;
+		m_rot_x -= offset.m_y * m_delta_time * 0.1f;
+		m_rot_y -= offset.m_x * m_delta_time * 0.1f;
 	}
 	if (m_is_rbutton_pressed)
 	{

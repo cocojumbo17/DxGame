@@ -87,6 +87,16 @@ void InputSystem::Update()
 	KeyboardHandle();
 }
 
+void InputSystem::ShowCursor(bool is_show)
+{
+	::ShowCursor(is_show);
+}
+
+void InputSystem::SetPosCursor(Point2d pos)
+{
+	::SetCursorPos(pos.m_x, pos.m_y);
+}
+
 void InputSystem::AddListener(IInputListener* p_listener)
 {
 	m_listeners.insert(p_listener);

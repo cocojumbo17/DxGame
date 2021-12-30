@@ -11,6 +11,8 @@ public:
 	virtual ~InputSystem();
 	static InputSystem* Instance();
 	void Update();
+	void ShowCursor(bool is_show);
+	void SetPosCursor(Point2d pos);
 	void AddListener(IInputListener* p_listener);
 	void RemoveListener(IInputListener* p_listener);
 private:
