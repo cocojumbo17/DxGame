@@ -118,6 +118,8 @@
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\PixelShader.h" />
     <ClInclude Include="src\Point2d.h" />
+    <ClInclude Include="src\Prerequisites.h" />
+    <ClInclude Include="src\RenderSystem.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Vector3d.h" />
@@ -139,6 +141,7 @@
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\PixelShader.cpp" />
     <ClCompile Include="src\Point2d.cpp" />
+    <ClCompile Include="src\RenderSystem.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Vector3d.cpp" />

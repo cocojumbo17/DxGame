@@ -6,41 +6,41 @@
 
 namespace Time
 {
-	std::wstring GetTime(bool is_short_format)
+	std::string GetTime(bool is_short_format)
 	{
 		time_t now = time(nullptr);
 		tm ltm;
 		localtime_s(&ltm, &now);
-		std::wstringstream wss;
+		std::stringstream wss;
 		if (is_short_format)
-			wss << std::setw(2) << std::setfill(L'0') << ltm.tm_hour << std::setw(2) << std::setfill(L'0') << ltm.tm_min << std::setw(2) << std::setfill(L'0') << ltm.tm_sec;
+			wss << std::setw(2) << std::setfill('0') << ltm.tm_hour << std::setw(2) << std::setfill('0') << ltm.tm_min << std::setw(2) << std::setfill('0') << ltm.tm_sec;
 		else
-			wss << std::setw(2) << std::setfill(L'0') << ltm.tm_hour << L":" << std::setw(2) << std::setfill(L'0') << ltm.tm_min << L":" << std::setw(2) << std::setfill(L'0') << ltm.tm_sec;
+			wss << std::setw(2) << std::setfill('0') << ltm.tm_hour << ":" << std::setw(2) << std::setfill('0') << ltm.tm_min << ":" << std::setw(2) << std::setfill('0') << ltm.tm_sec;
 
 		return wss.str();
 	}
 
-	std::wstring GetData(bool is_short_format)
+	std::string GetData(bool is_short_format)
 	{
 		time_t now = time(nullptr);
 		tm ltm;
 		localtime_s(&ltm, &now);
-		std::wstringstream wss;
+		std::stringstream wss;
 		wss.width(2);
 		wss.fill(L'0');
 		if (is_short_format)
-			wss << ltm.tm_year + 1900 << std::setw(2) << std::setfill(L'0') << ltm.tm_mon << std::setw(2) << std::setfill(L'0') << ltm.tm_mday;
+			wss << ltm.tm_year + 1900 << std::setw(2) << std::setfill('0') << ltm.tm_mon << std::setw(2) << std::setfill('0') << ltm.tm_mday;
 		else
-			wss << ltm.tm_year + 1900 << L"/" << std::setw(2) << std::setfill(L'0') << ltm.tm_mon << L"/" << std::setw(2) << std::setfill(L'0') << ltm.tm_mday;
+			wss << ltm.tm_year + 1900 << "/" << std::setw(2) << std::setfill('0') << ltm.tm_mon << "/" << std::setw(2) << std::setfill('0') << ltm.tm_mday;
 
 		return wss.str();
 	}
 
-	std::wstring GetDataTime(bool is_short_format)
+	std::string GetDataTime(bool is_short_format)
 	{
-		std::wstring res = GetData(is_short_format);
+		std::string res = GetData(is_short_format);
 		if (!is_short_format)
-			res += L" ";
+			res += " ";
 		res += GetTime(is_short_format);
 		return res;
 	}

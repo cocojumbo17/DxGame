@@ -6,22 +6,17 @@
 #include "ConstantBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "RenderSystem.h"
 
-DeviceContext::DeviceContext(ID3D11DeviceContext* ctx)
+DeviceContext::DeviceContext(RenderSystem* p_system, ID3D11DeviceContext* ctx)
 	: mp_imm_ctx(ctx)
+	, mp_system(p_system)
 {
 }
 
 DeviceContext::~DeviceContext()
 {
-}
-
-
-bool DeviceContext::Release()
-{
 	SAFE_RELEASE(mp_imm_ctx);
-	delete this;
-	return true;
 }
 
 void DeviceContext::ClearRenderTargetColor(SwapChain* p_swap_chain, float r, float g, float b, float a)

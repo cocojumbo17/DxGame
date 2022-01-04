@@ -1,20 +1,15 @@
 #pragma once
-
-class GraphicsEngine;
-class DeviceContext;
+#include "Prerequisites.h"
 
 class PixelShader
 {
 public:
-	PixelShader();
+	PixelShader(RenderSystem* p_system, const void* p_shader_bytecode, size_t shader_size);
 	~PixelShader();
-	void Release();
-protected:
-	bool Init(const void* p_shader_bytecode, size_t shader_size);
-
 protected:
 	ID3D11PixelShader* mp_ps;
-	friend class GraphicsEngine;
+	RenderSystem* mp_system;
+	friend class RenderSystem;
 	friend class DeviceContext;
 };
 

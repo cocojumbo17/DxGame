@@ -8,13 +8,13 @@ public:
 	Logger();
 	~Logger();
 	static Logger* GetInstance();
-	static void PrintLog(const wchar_t* fmt, ...);
+	static void PrintLog(const char* fmt, ...);
 	static void PrintSeparator();
-	static std::wstring LogDirectory();
-	static std::wstring LogFile();
+	static std::string LogDirectory();
+	static std::string LogFile();
 private:
-	void WriteBuffer(const wchar_t* buf, bool with_timestamp = true);
+	void WriteBuffer(const char* buf, bool with_timestamp = true);
 private:
 	static Logger* s_self;
-	std::wfstream	m_log_file;
+	std::fstream	m_log_file;
 };

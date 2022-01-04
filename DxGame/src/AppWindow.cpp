@@ -12,6 +12,7 @@
 #include "Matrix4x4.h"
 #include <math.h>
 #include "InputSystem.h"
+#include "RenderSystem.h"
 
 struct vertex
 {
@@ -36,21 +37,20 @@ AppWindow::AppWindow()
 	, m_forward(0.0f)
 	, m_rightward(0.0f)
 {
-	Logger::PrintLog(L"AppWindow::AppWindow");
+	Logger::PrintLog("AppWindow::AppWindow");
 }
 
 AppWindow::~AppWindow()
 {
-	Logger::PrintLog(L"AppWindow::~AppWindow");
+	Logger::PrintLog("AppWindow::~AppWindow");
 }
 
 void AppWindow::OnCreate()
 {
-	Logger::PrintLog(L"AppWindow::OnCreate");
+	Logger::PrintLog("AppWindow::OnCreate");
 	GraphicsEngine::Instance()->Init();
-	mp_swap_chain = GraphicsEngine::Instance()->CreateSwapChain();
 	RECT rc = GetClientWindowRect();
-	mp_swap_chain->Init(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
+	mp_swap_chain = GraphicsEngine::Instance()->GetRenderSystem()->CreateSwapChain(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 	vertex v[] = {
 		{Vector3d(-0.5f, -0.5f, 0.5f),	Vector3d(0,0,1),	Vector3d(0,0,1)},
@@ -66,7 +66,6 @@ void AppWindow::OnCreate()
 	UINT vertex_size = sizeof(vertex);
 	UINT list_size = ARRAYSIZE(v);
 
-	mp_vb = GraphicsEngine::Instance()->CreateVertexBuffer();
 
 
 	int indixes[] = {
@@ -83,64 +82,62 @@ void AppWindow::OnCreate()
 		4,5,0,
 		5,1,0
 	};
-	mp_ib = GraphicsEngine::Instance()->CreateIndexBuffer();
-	mp_ib->Load(indixes, ARRAYSIZE(indixes));
+	mp_ib = GraphicsEngine::Instance()->GetRenderSystem()->CreateIndexBuffer(indixes, ARRAYSIZE(indixes));
 	
-	mp_cb = GraphicsEngine::Instance()->CreateConstantBuffer();
 	constant cc;
-	mp_cb->Load(&cc, sizeof(cc));
+	mp_cb = GraphicsEngine::Instance()->GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(cc));
 
 	void* p_shader_bytecode = nullptr;
 	size_t shader_size = 0;
-	if (GraphicsEngine::Instance()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
+	if (GraphicsEngine::Instance()->GetRenderSystem()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
 	{
-		mp_vs = GraphicsEngine::Instance()->CreateVertexShader(p_shader_bytecode, shader_size);
+		mp_vs = GraphicsEngine::Instance()->GetRenderSystem()->CreateVertexShader(p_shader_bytecode, shader_size);
 	}
-	mp_vb->Load(v, vertex_size, list_size, p_shader_bytecode, shader_size);
-	GraphicsEngine::Instance()->ReleaseCompiledShader();
+	mp_vb = GraphicsEngine::Instance()->GetRenderSystem()->CreateVertexBuffer(v, vertex_size, list_size, p_shader_bytecode, shader_size);
+	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
 
-	if (GraphicsEngine::Instance()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
+	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
 	{
-		mp_ps = GraphicsEngine::Instance()->CreatePixelShader(p_shader_bytecode, shader_size);
+		mp_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
-	GraphicsEngine::Instance()->ReleaseCompiledShader();
+	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
 	m_camera_matrix.SetTranslation(Vector3d(0,0,-2.0f));
 	InputSystem::Instance()->ShowCursor(false);
 }
 
 void AppWindow::OnDestroy()
 {
-	mp_cb->Release();
-	mp_ib->Release();
-	mp_vb->Release();
-	mp_vs->Release();
-	mp_ps->Release();
-	mp_swap_chain->Release();
+	delete mp_cb;
+	delete mp_ib;
+	delete mp_vb;
+	delete mp_vs;
+	delete mp_ps;
+	delete mp_swap_chain;
 	GraphicsEngine::Instance()->Release();
 	Window::OnDestroy();
-	Logger::PrintLog(L"AppWindow::OnDestroy");
+	Logger::PrintLog("AppWindow::OnDestroy");
 }
 
 void AppWindow::OnUpdate()
 {
 	InputSystem::Instance()->Update();
-	GraphicsEngine::Instance()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.28f, 0.28f, 0.28f, 1);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.28f, 0.28f, 0.28f, 1);
 	RECT rc = GetClientWindowRect();
-	GraphicsEngine::Instance()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
 
 	Update();
 
-	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferVS(mp_cb);
-	GraphicsEngine::Instance()->GetDeviceContext()->SetConstantBufferPS(mp_cb);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferVS(mp_cb);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferPS(mp_cb);
 
 
-	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexShader(mp_vs);
-	GraphicsEngine::Instance()->GetDeviceContext()->SetPixelShader(mp_ps);
-	GraphicsEngine::Instance()->GetDeviceContext()->SetVertexBuffer(mp_vb);
-	GraphicsEngine::Instance()->GetDeviceContext()->SetIndexBuffer(mp_ib);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(mp_vs);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(mp_ps);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mp_vb);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mp_ib);
 
 
-	GraphicsEngine::Instance()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_ib->GetListSize(), 0, 0);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_ib->GetListSize(), 0, 0);
 
 	mp_swap_chain->Present(true);
 }
@@ -175,7 +172,7 @@ void AppWindow::Update()
 	int height = rc.bottom - rc.top;
 //	cc.m_proj.SetOrthoLH(width/300.0f, height/300.0f, -4.0f, 4.0f);
 	cc.m_proj.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
-	mp_cb->Update(GraphicsEngine::Instance()->GetDeviceContext(), &cc);
+	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
 }
 
 void AppWindow::OnKeyDown(byte key)

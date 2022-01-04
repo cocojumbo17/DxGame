@@ -3,7 +3,7 @@
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	//Logger log;
+	Logger log;
 	AppWindow main_wnd;
 	main_wnd.Init();
 	while (main_wnd.IsRun())

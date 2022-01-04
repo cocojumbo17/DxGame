@@ -1,16 +1,16 @@
 #pragma once
+#include "Prerequisites.h"
 
 class SwapChain
 {
 public:
-	SwapChain();
+	SwapChain(RenderSystem* p_system, HWND hwnd, int width, int height);
 	virtual ~SwapChain();
-	bool Init(HWND hwnd, int width, int height);
-	bool Release();
 	void Present(bool vsync);
 protected:
 	IDXGISwapChain* mp_swap_chain;
 	ID3D11RenderTargetView* mp_rtv;
+	RenderSystem* mp_system;
 	friend class DeviceContext;
 };
 

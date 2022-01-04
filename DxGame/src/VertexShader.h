@@ -1,20 +1,16 @@
 #pragma once
+#include "Prerequisites.h"
 
-class GraphicsEngine;
-class DeviceContext;
 
 class VertexShader
 {
 public:
-	VertexShader();
+	VertexShader(RenderSystem* p_system, const void* p_shader_bytecode, size_t shader_size);
 	~VertexShader();
-	void Release();
-protected:
-	bool Init(const void* p_shader_bytecode, size_t shader_size);
-
 protected:
 	ID3D11VertexShader* mp_vs;
-	friend class GraphicsEngine;
+	RenderSystem* mp_system;
+	friend class RenderSystem;
 	friend class DeviceContext;
 };
 
