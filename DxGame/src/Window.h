@@ -6,12 +6,8 @@ class Window
 public:
 	Window();
 	virtual ~Window();
-	bool Init();
-	bool Release();
-	bool Broadcast();
 	bool IsRun();
 	RECT GetClientWindowRect();
-	void SetHWND(HWND hwnd);
 	//Events
 	virtual void OnCreate() = 0;
 	virtual void OnDestroy() = 0;
@@ -22,8 +18,10 @@ public:
 protected:
 	bool RegisterWin();
 	bool CreateWin();
+	bool Broadcast();
 
 protected:
+	bool m_is_init;
 	bool m_is_run;
 	HWND m_hwnd;
 };

@@ -8,7 +8,8 @@ class IInputListener;
 class InputSystem
 {
 public:
-	virtual ~InputSystem();
+	static void Create();
+	static void Release();
 	static InputSystem* Instance();
 	void Update();
 	void ShowCursor(bool is_show);
@@ -17,6 +18,7 @@ public:
 	void RemoveListener(IInputListener* p_listener);
 private:
 	InputSystem();
+	virtual ~InputSystem();
 	void Notify(byte key, bool is_down);
 	void KeyboardHandle();
 	void MouseHandle();
@@ -26,5 +28,7 @@ protected:
 	std::set<IInputListener*> m_listeners;
 	Point2d m_cur_mouse_pos;
 	Point2d m_old_mouse_pos;
+	static InputSystem* sp_is;
+
 };
 

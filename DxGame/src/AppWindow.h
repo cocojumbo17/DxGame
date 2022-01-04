@@ -2,14 +2,7 @@
 #include "Window.h"
 #include "IInputListener.h"
 #include "Matrix4x4.h"
-
-class SwapChain;
-class VertexBuffer;
-class IndexBuffer;
-class ConstantBuffer;
-class VertexShader;
-class PixelShader;
-
+#include "Prerequisites.h"
 
 class AppWindow :
     public Window,
@@ -38,12 +31,12 @@ protected:
     virtual void OnMouseRKeyUp(const Point2d& pos) override;
 
 protected:
-    SwapChain* mp_swap_chain;
-    VertexBuffer* mp_vb;
-    IndexBuffer* mp_ib;
-    ConstantBuffer* mp_cb;
-    VertexShader* mp_vs;
-    PixelShader* mp_ps;
+    SwapChainPtr mp_swap_chain;
+    VertexBufferPtr mp_vb;
+    IndexBufferPtr mp_ib;
+    ConstantBufferPtr mp_cb;
+    VertexShaderPtr mp_vs;
+    PixelShaderPtr mp_ps;
     unsigned int m_prev_time;
     float m_delta_time;
     float m_rot_x;

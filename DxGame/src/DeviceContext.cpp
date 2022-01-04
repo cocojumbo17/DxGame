@@ -19,14 +19,14 @@ DeviceContext::~DeviceContext()
 	SAFE_RELEASE(mp_imm_ctx);
 }
 
-void DeviceContext::ClearRenderTargetColor(SwapChain* p_swap_chain, float r, float g, float b, float a)
+void DeviceContext::ClearRenderTargetColor(SwapChainPtr p_swap_chain, float r, float g, float b, float a)
 {
 	FLOAT color[] = { r,g,b,a };
 	mp_imm_ctx->ClearRenderTargetView(p_swap_chain->mp_rtv, color);
 	mp_imm_ctx->OMSetRenderTargets(1, &p_swap_chain->mp_rtv, nullptr);
 }
 
-void DeviceContext::SetVertexBuffer(VertexBuffer* p_vertex_buffer)
+void DeviceContext::SetVertexBuffer(VertexBufferPtr p_vertex_buffer)
 {
 	UINT strides[] = { (UINT)p_vertex_buffer->m_vertex_size };
 	UINT offsets[] = { 0 };
@@ -34,27 +34,27 @@ void DeviceContext::SetVertexBuffer(VertexBuffer* p_vertex_buffer)
 	mp_imm_ctx->IASetInputLayout(p_vertex_buffer->mp_input_layout);
 }
 
-void DeviceContext::SetIndexBuffer(IndexBuffer* p_index_buffer)
+void DeviceContext::SetIndexBuffer(IndexBufferPtr p_index_buffer)
 {
 	mp_imm_ctx->IASetIndexBuffer(p_index_buffer->mp_buffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void DeviceContext::SetConstantBufferVS(ConstantBuffer* p_constant_buffer)
+void DeviceContext::SetConstantBufferVS(ConstantBufferPtr p_constant_buffer)
 {
 	mp_imm_ctx->VSSetConstantBuffers(0, 1, &p_constant_buffer->mp_buffer);
 }
 
-void DeviceContext::SetConstantBufferPS(ConstantBuffer* p_constant_buffer)
+void DeviceContext::SetConstantBufferPS(ConstantBufferPtr p_constant_buffer)
 {
 	mp_imm_ctx->PSSetConstantBuffers(0, 1, &p_constant_buffer->mp_buffer);
 }
 
-void DeviceContext::SetVertexShader(VertexShader* p_vertex_shader)
+void DeviceContext::SetVertexShader(VertexShaderPtr p_vertex_shader)
 {
 	mp_imm_ctx->VSSetShader(p_vertex_shader->mp_vs, nullptr, 0);
 }
 
-void DeviceContext::SetPixelShader(PixelShader* p_pixel_shader)
+void DeviceContext::SetPixelShader(PixelShaderPtr p_pixel_shader)
 {
 	mp_imm_ctx->PSSetShader(p_pixel_shader->mp_ps, nullptr, 0);
 }

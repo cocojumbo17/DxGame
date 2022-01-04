@@ -1,15 +1,38 @@
 #include "pch.h"
 #include "AppWindow.h"
+#include "GraphicsEngine.h"
+#include "InputSystem.h"
+
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	Logger log;
-	AppWindow main_wnd;
-	main_wnd.Init();
-	while (main_wnd.IsRun())
+	//Logger log;
+	try
 	{
-		main_wnd.Broadcast();
+		GraphicsEngine::Create();
+		InputSystem::Create();
 	}
-	main_wnd.Release();
+	catch (const std::exception&)
+	{
+		return -1;
+	}
+
+	{
+		try
+		{
+			AppWindow main_wnd;
+			while (main_wnd.IsRun());
+		}
+		catch (const std::exception&)
+		{
+			InputSystem::Release();
+			GraphicsEngine::Release();
+			return -1;
+		}
+	}
+
+	InputSystem::Release();
+	GraphicsEngine::Release();
+
 	return 0;
 }

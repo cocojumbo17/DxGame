@@ -48,7 +48,6 @@ AppWindow::~AppWindow()
 void AppWindow::OnCreate()
 {
 	Logger::PrintLog("AppWindow::OnCreate");
-	GraphicsEngine::Instance()->Init();
 	RECT rc = GetClientWindowRect();
 	mp_swap_chain = GraphicsEngine::Instance()->GetRenderSystem()->CreateSwapChain(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
@@ -107,13 +106,6 @@ void AppWindow::OnCreate()
 
 void AppWindow::OnDestroy()
 {
-	delete mp_cb;
-	delete mp_ib;
-	delete mp_vb;
-	delete mp_vs;
-	delete mp_ps;
-	delete mp_swap_chain;
-	GraphicsEngine::Instance()->Release();
 	Window::OnDestroy();
 	Logger::PrintLog("AppWindow::OnDestroy");
 }

@@ -4,15 +4,17 @@
 class GraphicsEngine
 {
 public:
-	virtual ~GraphicsEngine();
-	bool Init();
-	bool Release();
-	RenderSystem* GetRenderSystem();
+	static void Create();
+	static void Release();
 	static GraphicsEngine* Instance();
+
+	RenderSystem* GetRenderSystem();
 
 private:
 	GraphicsEngine();
+	virtual ~GraphicsEngine();
 protected:
 	RenderSystem* mp_system;
+	static GraphicsEngine* sp_ge;
 };
 

@@ -1,33 +1,33 @@
 #include "pch.h"
 #include "Window.h"
+#include <exception>
 
 Window::Window()
-    :m_is_run(false)
+    : m_is_run(false)
+	, m_is_init(false)
 {
+	if (!RegisterWin())
+		throw(std::exception("RegisterWin is failed."));
+	if (!CreateWin())
+		throw(std::exception("CreateWin is failed."));
 }
 
 Window::~Window()
 {
+	::DestroyWindow(m_hwnd);
 }
 
-bool Window::Init()
-{
-    if (!RegisterWin())
-        return false;
-    if (!CreateWin())
-        return false;
-    return true;
-}
-
-bool Window::Release()
-{
-	if (!::DestroyWindow(m_hwnd))
-		return false;
-    return true;
-}
 
 bool Window::Broadcast()
 {
+	if (!m_is_init)
+	{
+		m_is_init = true;
+		::SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+		OnSetFocus();
+		OnCreate();
+
+	}
 	MSG msg{ 0 };
 	OnUpdate();
 	while (::PeekMessage(&msg, m_hwnd, 0, 0, PM_REMOVE) > 0)
@@ -41,6 +41,8 @@ bool Window::Broadcast()
 
 bool Window::IsRun()
 {
+	if (m_is_run)
+		Broadcast();
     return m_is_run;
 }
 
@@ -51,21 +53,12 @@ RECT Window::GetClientWindowRect()
 	return rc;
 }
 
-void Window::SetHWND(HWND hwnd)
-{
-	m_hwnd = hwnd;
-}
-
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg) 
 	{
 	case WM_CREATE:
 	{
-		Window* p_wnd = (Window*)((CREATESTRUCT*)lparam)->lpCreateParams;
-		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)p_wnd);
-		p_wnd->SetHWND(hwnd);
-		p_wnd->OnCreate();
 		break;
 	}
 	case WM_DESTROY:
@@ -121,7 +114,7 @@ void Window::OnDestroy()
 
 bool Window::CreateWin()
 {
-	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, nullptr, nullptr, nullptr, this);
+	m_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DxWindowClass", L"DirectX window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, nullptr, nullptr, nullptr, NULL);
 
 	if (!m_hwnd)
 		return false;

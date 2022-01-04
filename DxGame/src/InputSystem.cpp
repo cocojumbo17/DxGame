@@ -2,6 +2,8 @@
 #include "InputSystem.h"
 #include "IInputListener.h"
 
+InputSystem* InputSystem::sp_is = nullptr;
+
 InputSystem::InputSystem()
 {
 }
@@ -9,7 +11,23 @@ InputSystem::InputSystem()
 InputSystem::~InputSystem()
 {
 	m_listeners.clear();
+	InputSystem::sp_is = nullptr;
 }
+
+void InputSystem::Create()
+{
+	if (InputSystem::sp_is)
+		throw(std::exception("InputSystem is already created."));
+	InputSystem::sp_is = new InputSystem();
+}
+
+void InputSystem::Release()
+{
+	if (!InputSystem::sp_is)
+		return;
+	delete InputSystem::sp_is;
+}
+
 
 void InputSystem::Notify(byte key, bool is_down)
 {
@@ -77,8 +95,7 @@ void InputSystem::MouseHandle()
 
 InputSystem* InputSystem::Instance()
 {
-	static InputSystem inst;
-	return &inst;
+	return InputSystem::sp_is;
 }
 
 void InputSystem::Update()

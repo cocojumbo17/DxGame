@@ -76,6 +76,9 @@
     <PostBuildEvent>
       <Command>xcopy *.hlsl $(OutDir) /Y</Command>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -104,6 +107,9 @@
     <PostBuildEvent>
       <Command>xcopy *.hlsl $(OutDir) /Y</Command>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\AppWindow.h" />

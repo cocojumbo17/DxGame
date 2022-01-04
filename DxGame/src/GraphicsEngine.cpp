@@ -2,27 +2,40 @@
 #include "GraphicsEngine.h"
 #include "RenderSystem.h"
 
+GraphicsEngine* GraphicsEngine::sp_ge = nullptr;
 
 GraphicsEngine::GraphicsEngine()
 	:mp_system(nullptr)
 {
+	try
+	{
+		mp_system = new RenderSystem();
+	}
+	catch (const std::exception& e)
+	{
+		Logger::PrintLog("[ERROR] %s", e.what());
+		throw;
+	}
 }
 
 GraphicsEngine::~GraphicsEngine()
 {
+	delete mp_system;
+	GraphicsEngine::sp_ge = nullptr;
 }
 
-bool GraphicsEngine::Init()
+void GraphicsEngine::Create()
 {
-	mp_system = new RenderSystem();
-	mp_system->Init();
-	return true;
+	if (GraphicsEngine::sp_ge)
+		throw(std::exception("GraphicsEngine is already created."));
+	GraphicsEngine::sp_ge = new GraphicsEngine();
 }
 
-bool GraphicsEngine::Release()
+void GraphicsEngine::Release()
 {
-	SAFE_RELEASE(mp_system);
-	return true;
+	if (!GraphicsEngine::sp_ge)
+		return;
+	delete GraphicsEngine::sp_ge;
 }
 
 RenderSystem* GraphicsEngine::GetRenderSystem()
@@ -32,8 +45,7 @@ RenderSystem* GraphicsEngine::GetRenderSystem()
 
 GraphicsEngine* GraphicsEngine::Instance()
 {
-	static GraphicsEngine inst;
-	return &inst;
+	return GraphicsEngine::sp_ge;
 }
 
 
