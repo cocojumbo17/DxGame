@@ -47,3 +47,20 @@ void SwapChain::Present(bool vsync)
 {
     mp_swap_chain->Present(vsync, NULL);
 }
+
+bool SwapChain::Resize()
+{
+    SAFE_RELEASE(mp_rtv);
+    HRESULT hr = mp_swap_chain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+    if (SUCCEEDED(hr))
+    {
+        ID3D11Texture2D* p_buf = nullptr;
+        hr = mp_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&p_buf);
+        if (SUCCEEDED(hr))
+        {
+            hr = mp_system->mp_d3d_device->CreateRenderTargetView((ID3D11Resource*)p_buf, nullptr, &mp_rtv);
+            SAFE_RELEASE(p_buf);
+        }
+    }
+    return SUCCEEDED(hr);
+}

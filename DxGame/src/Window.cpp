@@ -83,6 +83,13 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			p_wnd->OnKillFocus();
 		break;
 	}
+	case WM_SIZE:
+	{
+		Window* p_wnd = (Window*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (p_wnd)
+			p_wnd->OnResize();
+		break;
+	}
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}

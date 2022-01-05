@@ -20,6 +20,7 @@ protected:
     virtual void OnUpdate() override;
     virtual void OnSetFocus() override;
     virtual void OnKillFocus() override;
+    virtual void OnResize() override;
 
     // Inherited via IInputListener
     virtual void OnKeyDown(byte key) override;

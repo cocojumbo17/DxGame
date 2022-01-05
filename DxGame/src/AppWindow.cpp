@@ -158,7 +158,7 @@ void AppWindow::OnCreate()
 		mp_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
-	InputSystem::Instance()->ShowCursor(false);
+//	InputSystem::Instance()->ShowCursor(false);
 }
 
 void AppWindow::OnDestroy()
@@ -291,4 +291,9 @@ void AppWindow::OnSetFocus()
 void AppWindow::OnKillFocus()
 {
 	InputSystem::Instance()->RemoveListener(this);
+}
+
+void AppWindow::OnResize()
+{
+	mp_swap_chain->Resize();
 }
