@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 namespace Time
 {
 	std::string GetTime(bool is_short_format = false);

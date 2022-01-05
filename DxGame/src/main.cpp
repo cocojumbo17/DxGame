@@ -6,7 +6,7 @@
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	//Logger log;
+	Logger log;
 	try
 	{
 		GraphicsEngine::Create();

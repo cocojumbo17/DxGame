@@ -153,12 +153,8 @@ bool RenderSystem::CompileVertexShader(const wchar_t* shader_file, const char* e
 	}
 	else
 	{
-		size_t len = errblob->GetBufferSize();
 		char* err = (char*)errblob->GetBufferPointer();
-		wchar_t* w_err = new wchar_t[len];
-		mbstowcs_s(nullptr, w_err, len, err, len);
-		Logger::PrintLog("[ERROR] CompilePixelShader: %s", w_err);
-		delete[]w_err;
+		Logger::PrintLog("[ERROR] CompilePixelShader: %s", err);
 		SAFE_RELEASE(errblob);
 	}
 	return false;
@@ -176,12 +172,8 @@ bool RenderSystem::CompilePixelShader(const wchar_t* shader_file, const char* en
 	}
 	else
 	{
-		size_t len = errblob->GetBufferSize();
 		char* err = (char*)errblob->GetBufferPointer();
-		wchar_t* w_err = new wchar_t[len];
-		mbstowcs_s(nullptr, w_err, len, err, len);
-		Logger::PrintLog("[ERROR] CompilePixelShader: %s", w_err);
-		delete[]w_err;
+		Logger::PrintLog("[ERROR] CompilePixelShader: %s", err);
 		SAFE_RELEASE(errblob);
 	}
 	return false;

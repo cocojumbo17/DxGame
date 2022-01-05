@@ -84,7 +84,9 @@ void Matrix4x4::SetPerspectiveFovLH(float fov, float aspect, float near_plane, f
 	m_matrix[2][2] = far_plane / (far_plane - near_plane);
 	m_matrix[2][3] = 1.0f;
 	m_matrix[3][2] = (-near_plane*far_plane) / (far_plane - near_plane);
+	m_matrix[3][3] = 0.0f;
 }
+
 
 void Matrix4x4::operator*=(const Matrix4x4& other)
 {
@@ -129,7 +131,7 @@ void Matrix4x4::Inverse()
 		}
 		v.Cross(vec[0], vec[1], vec[2]);
 
-		float sign = (i % 2 == 1) ? -1.0f : 1.0f;
+		float sign = ((i % 2) == 1) ? -1.0f : 1.0f;
 		out.m_matrix[0][i] = sign * v.m_x / det;
 		out.m_matrix[1][i] = sign * v.m_y / det;
 		out.m_matrix[2][i] = sign * v.m_z / det;

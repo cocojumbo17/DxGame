@@ -37,5 +37,6 @@ protected:
 	friend class PixelShader;
 	friend class ConstantBuffer;
 	friend class GraphicsEngine;
+	friend class Texture;
 };
 

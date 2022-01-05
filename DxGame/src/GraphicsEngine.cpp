@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GraphicsEngine.h"
 #include "RenderSystem.h"
+#include "TextureManager.h"
 
 GraphicsEngine* GraphicsEngine::sp_ge = nullptr;
 
@@ -16,10 +17,21 @@ GraphicsEngine::GraphicsEngine()
 		Logger::PrintLog("[ERROR] %s", e.what());
 		throw;
 	}
+
+	try
+	{
+		mp_texture_manager = new TextureManager();
+	}
+	catch (const std::exception& e)
+	{
+		Logger::PrintLog("[ERROR] %s", e.what());
+		throw;
+	}
 }
 
 GraphicsEngine::~GraphicsEngine()
 {
+	delete mp_texture_manager;
 	delete mp_system;
 	GraphicsEngine::sp_ge = nullptr;
 }
@@ -41,6 +53,11 @@ void GraphicsEngine::Release()
 RenderSystem* GraphicsEngine::GetRenderSystem()
 {
 	return mp_system;
+}
+
+TextureManager* GraphicsEngine::GetTextureManager()
+{
+	return mp_texture_manager;
 }
 
 GraphicsEngine* GraphicsEngine::Instance()

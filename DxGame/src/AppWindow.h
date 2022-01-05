@@ -37,6 +37,7 @@ protected:
     ConstantBufferPtr mp_cb;
     VertexShaderPtr mp_vs;
     PixelShaderPtr mp_ps;
+    TexturePtr mp_wood_texture;
     unsigned int m_prev_time;
     float m_delta_time;
     float m_rot_x;
