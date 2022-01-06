@@ -24,7 +24,8 @@ void DeviceContext::ClearRenderTargetColor(const SwapChainPtr& p_swap_chain, flo
 {
 	FLOAT color[] = { r,g,b,a };
 	mp_imm_ctx->ClearRenderTargetView(p_swap_chain->mp_rtv, color);
-	mp_imm_ctx->OMSetRenderTargets(1, &p_swap_chain->mp_rtv, nullptr);
+	mp_imm_ctx->ClearDepthStencilView(p_swap_chain->mp_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	mp_imm_ctx->OMSetRenderTargets(1, &p_swap_chain->mp_rtv, p_swap_chain->mp_dsv);
 }
 
 void DeviceContext::SetVertexBuffer(const VertexBufferPtr& p_vertex_buffer)

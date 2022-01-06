@@ -39,6 +39,7 @@ protected:
     VertexShaderPtr mp_vs;
     PixelShaderPtr mp_ps;
     TexturePtr mp_wood_texture;
+    MeshPtr mp_teapot;
     unsigned int m_prev_time;
     float m_delta_time;
     float m_rot_x;

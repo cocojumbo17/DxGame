@@ -15,7 +15,8 @@
 #include "InputSystem.h"
 #include "RenderSystem.h"
 #include "TextureManager.h"
-
+#include "MeshManager.h"
+#include "Mesh.h"
 struct vertex
 {
 	Vector3d pos;
@@ -51,8 +52,8 @@ void AppWindow::OnCreate()
 	Logger::PrintLog("AppWindow::OnCreate");
 
 
-	mp_wood_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\wood.jpg");
-
+	mp_wood_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\brick.png");
+	mp_teapot = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\teapot.obj");
 
 	RECT rc = GetClientWindowRect();
 	mp_swap_chain = GraphicsEngine::Instance()->GetRenderSystem()->CreateSwapChain(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
@@ -183,11 +184,11 @@ void AppWindow::OnUpdate()
 
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(mp_vs);
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(mp_ps);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mp_vb);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mp_ib);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mp_teapot->GetVertexBuffer());
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mp_teapot->GetIndexBuffer());
 
 
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_ib->GetListSize(), 0, 0);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_teapot->GetIndexBuffer()->GetListSize(), 0, 0);
 
 	mp_swap_chain->Present(true);
 }
