@@ -52,9 +52,13 @@ Mesh::Mesh(const wchar_t* full_path)
 				tinyobj::real_t vy = attrib.vertices[index.vertex_index * 3 + 1];
 				tinyobj::real_t vz = attrib.vertices[index.vertex_index * 3 + 2];
 
+				tinyobj::real_t nx = attrib.normals[index.normal_index * 3 + 0];
+				tinyobj::real_t ny = attrib.normals[index.normal_index * 3 + 1];
+				tinyobj::real_t nz = attrib.normals[index.normal_index * 3 + 2];
+
 				tinyobj::real_t tu = attrib.texcoords[index.texcoord_index * 2 + 0];
 				tinyobj::real_t tv = attrib.texcoords[index.texcoord_index * 2 + 1];
-				vertices.push_back(VertexMesh(Vector3d(vx,vy,vz), Vector2d(tu,tv)));
+				vertices.push_back(VertexMesh(Vector3d(vx,vy,vz), Vector2d(tu,tv), Vector3d(nx, ny, nz)));
 				indices.push_back(index_base + i);
 			}
 			index_base += num_verts;

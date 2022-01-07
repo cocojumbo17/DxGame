@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Vector4d.h"
+#include "Vector3d.h"
 
 Vector4d::Vector4d()
 	: m_x(0)
@@ -22,6 +23,14 @@ Vector4d::Vector4d(const Vector4d& vec)
 	, m_y(vec.m_y)
 	, m_z(vec.m_z)
 	, m_w(vec.m_w)
+{
+}
+
+Vector4d::Vector4d(const Vector3d& vec)
+	: m_x(vec.m_x)
+	, m_y(vec.m_y)
+	, m_z(vec.m_z)
+	, m_w(1.0f)
 {
 }
 

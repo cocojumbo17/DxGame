@@ -33,8 +33,6 @@ protected:
 
 protected:
     SwapChainPtr mp_swap_chain;
-    VertexBufferPtr mp_vb;
-    IndexBufferPtr mp_ib;
     ConstantBufferPtr mp_cb;
     VertexShaderPtr mp_vs;
     PixelShaderPtr mp_ps;
@@ -44,6 +42,7 @@ protected:
     float m_delta_time;
     float m_rot_x;
     float m_rot_y;
+    float m_light_rot_y;
     bool m_is_lbutton_pressed;
     bool m_is_rbutton_pressed;
     float m_scale;
