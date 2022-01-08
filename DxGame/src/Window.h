@@ -8,6 +8,7 @@ public:
 	virtual ~Window();
 	bool IsRun();
 	RECT GetClientWindowRect();
+	void GetScreenSize(int& w, int& h);
 	//Events
 	virtual void OnCreate() = 0;
 	virtual void OnDestroy() = 0;

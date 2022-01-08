@@ -53,6 +53,12 @@ RECT Window::GetClientWindowRect()
 	return rc;
 }
 
+void Window::GetScreenSize(int& w, int& h)
+{
+	w = GetSystemMetrics(SM_CXSCREEN);
+	h = GetSystemMetrics(SM_CYSCREEN);
+}
+
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg) 

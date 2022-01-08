@@ -43,6 +43,7 @@ AppWindow::AppWindow()
 	, m_forward(0.0f)
 	, m_rightward(0.0f)
 	, m_light_rot_y(0.0f)
+	, m_is_fullscreen_state(false)
 {
 	Logger::PrintLog("AppWindow::AppWindow");
 }
@@ -92,18 +93,23 @@ void AppWindow::OnCreate()
 		mp_sky_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
-	//	InputSystem::Instance()->ShowCursor(false);
 }
 
 void AppWindow::OnDestroy()
 {
 	Window::OnDestroy();
+	mp_swap_chain->SetFullScreen(false, 1, 1);
 	Logger::PrintLog("AppWindow::OnDestroy");
 }
 
 void AppWindow::OnUpdate()
 {
 	InputSystem::Instance()->Update();
+	Render();
+}
+
+void AppWindow::Render()
+{
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->ClearRenderTargetColor(mp_swap_chain, 0.28f, 0.28f, 0.28f, 1);
 	RECT rc = GetClientWindowRect();
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetViewport(rc.right - rc.left, rc.bottom - rc.top);
@@ -220,6 +226,14 @@ void AppWindow::OnKeyUp(byte key)
 {
 	m_forward = 0.0f;
 	m_rightward = 0.0f;
+	switch (std::toupper(key)) {
+	case 'F':
+		m_is_fullscreen_state = !m_is_fullscreen_state;
+		int w, h;
+		GetScreenSize(w, h);
+		mp_swap_chain->SetFullScreen(m_is_fullscreen_state, w, h);
+		break;
+	};
 }
 
 void AppWindow::OnMouseMove(const Point2d& offset)
@@ -267,5 +281,8 @@ void AppWindow::OnKillFocus()
 
 void AppWindow::OnResize()
 {
-	mp_swap_chain->Resize();
+	RECT rect;
+	GetClientRect(m_hwnd, &rect);
+	mp_swap_chain->Resize(rect.right-rect.left, rect.bottom-rect.top);
+	Render();
 }

@@ -7,10 +7,12 @@ public:
 	SwapChain(RenderSystem* p_system, HWND hwnd, int width, int height);
 	virtual ~SwapChain();
 	void Present(bool vsync);
-	bool Resize();
+	bool Resize(int width, int height);
+	void SetFullScreen(bool is_fullscreen, int width, int height);
 protected:
 	void CreateTargetView();
-	void CreateDepthStencil();
+	void CreateDepthStencil(int width, int height);
+	void ResizeBuffers(int width, int height);
 protected:
 	IDXGISwapChain* mp_swap_chain;
 	ID3D11RenderTargetView* mp_rtv;

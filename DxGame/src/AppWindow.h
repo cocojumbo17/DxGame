@@ -12,6 +12,7 @@ public:
     AppWindow();
     virtual ~AppWindow();
 protected:
+    void Render();
     void Update();
     void UpdateCamera();
     void UpdateModel();
@@ -65,5 +66,7 @@ protected:
     Matrix4x4 m_world_camera;
     Matrix4x4 m_view_camera;
     Matrix4x4 m_proj_camera;
+
+    bool m_is_fullscreen_state;
 };
 
