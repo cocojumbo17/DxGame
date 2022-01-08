@@ -11,10 +11,34 @@
 #include <d3dcompiler.h>
 
 
+void RenderSystem::InitRasterizerState()
+{
+	D3D11_RASTERIZER_DESC desc = { 0 };
+	desc.CullMode = D3D11_CULL_FRONT;
+	desc.FillMode = D3D11_FILL_SOLID;
+	desc.DepthClipEnable = true;
+
+	HRESULT hr = mp_d3d_device->CreateRasterizerState(&desc, &mp_front_rasterizer_state);
+
+	desc.CullMode = D3D11_CULL_BACK;
+	hr = mp_d3d_device->CreateRasterizerState(&desc, &mp_back_rasterizer_state);
+}
+
+void RenderSystem::SetRasterizerState(bool is_cull_front)
+{
+	if (is_cull_front)
+		mp_imm_ctx->RSSetState(mp_front_rasterizer_state);
+	else
+		mp_imm_ctx->RSSetState(mp_back_rasterizer_state);
+}
+
+
 RenderSystem::RenderSystem()
 	: mp_d3d_device(nullptr)
 	, mp_dx_factory(nullptr)
 	, mp_blob(nullptr)
+	, mp_front_rasterizer_state(nullptr)
+	, mp_back_rasterizer_state(nullptr)
 {
 	D3D_DRIVER_TYPE driver_types[] = {
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -49,10 +73,13 @@ RenderSystem::RenderSystem()
 		}
 		SAFE_RELEASE(p_device);
 	}
+	InitRasterizerState();
 }
 
 RenderSystem::~RenderSystem()
 {
+	SAFE_RELEASE(mp_front_rasterizer_state);
+	SAFE_RELEASE(mp_back_rasterizer_state);
 	SAFE_RELEASE(mp_dx_factory);
 	SAFE_RELEASE(mp_d3d_device);
 }

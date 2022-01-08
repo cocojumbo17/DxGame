@@ -13,6 +13,10 @@ public:
     virtual ~AppWindow();
 protected:
     void Update();
+    void UpdateCamera();
+    void UpdateModel();
+    void UpdateSkyBox();
+    void DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, const TexturePtr& texture);
 
     // Inherited via Window
     virtual void OnCreate() override;
@@ -33,11 +37,20 @@ protected:
 
 protected:
     SwapChainPtr mp_swap_chain;
-    ConstantBufferPtr mp_cb;
     VertexShaderPtr mp_vs;
+
+    ConstantBufferPtr mp_cb;
+    ConstantBufferPtr mp_sky_cb;
+
     PixelShaderPtr mp_ps;
+    PixelShaderPtr mp_sky_ps;
+
     TexturePtr mp_wood_texture;
-    MeshPtr mp_teapot;
+    TexturePtr mp_sky_texture;
+
+    MeshPtr mp_mesh;
+    MeshPtr mp_sky_mesh;
+
     unsigned int m_prev_time;
     float m_delta_time;
     float m_rot_x;
@@ -48,6 +61,9 @@ protected:
     float m_scale;
     float m_forward;
     float m_rightward;
-    Matrix4x4 m_camera_matrix;
+    
+    Matrix4x4 m_world_camera;
+    Matrix4x4 m_view_camera;
+    Matrix4x4 m_proj_camera;
 };
 

@@ -13,6 +13,7 @@ cbuffer constant: register(b0) {
 	row_major float4x4 m_world;
 	row_major float4x4 m_view;
 	row_major float4x4 m_proj;
+	uint4 temp;
 	float4 m_light_direction;
 	float4 m_camera_position;
 };

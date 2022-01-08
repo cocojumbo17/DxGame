@@ -30,6 +30,8 @@ struct constant
 	Matrix4x4 m_world;
 	Matrix4x4 m_view;
 	Matrix4x4 m_proj;
+	unsigned int temp;
+	unsigned int pad[3];
 	Vector4d m_light_direction;
 	Vector4d m_camera_position;
 };
@@ -56,16 +58,20 @@ void AppWindow::OnCreate()
 
 
 	mp_wood_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\brick.png");
-	mp_teapot = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\statue.obj");
+	mp_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\sky.jpg");
+
+	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\suzanne.obj");
+	mp_sky_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere.obj");
 
 	RECT rc = GetClientWindowRect();
 	mp_swap_chain = GraphicsEngine::Instance()->GetRenderSystem()->CreateSwapChain(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
 
-	m_camera_matrix.SetTranslation(Vector3d(0, 0, -1.0f));
+	m_world_camera.SetTranslation(Vector3d(0, 0, -1.0f));
 
 	constant cc;
 	mp_cb = GraphicsEngine::Instance()->GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(cc));
+	mp_sky_cb = GraphicsEngine::Instance()->GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(cc));
 
 	void* p_shader_bytecode = nullptr;
 	size_t shader_size = 0;
@@ -80,7 +86,13 @@ void AppWindow::OnCreate()
 		mp_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
-//	InputSystem::Instance()->ShowCursor(false);
+	
+	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"SkyBoxPixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
+	{
+		mp_sky_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
+	}
+	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
+	//	InputSystem::Instance()->ShowCursor(false);
 }
 
 void AppWindow::OnDestroy()
@@ -98,32 +110,55 @@ void AppWindow::OnUpdate()
 
 	Update();
 
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferVS(mp_cb);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferPS(mp_cb);
-
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetTexturePS(mp_wood_texture);
-
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(mp_vs);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(mp_ps);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mp_teapot->GetVertexBuffer());
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mp_teapot->GetIndexBuffer());
-
-
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mp_teapot->GetIndexBuffer()->GetListSize(), 0, 0);
+	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(false);
+	DrawMesh(mp_mesh, mp_vs, mp_ps, mp_cb, mp_wood_texture);
+	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(true);
+	DrawMesh(mp_sky_mesh, mp_vs, mp_sky_ps, mp_sky_cb, mp_sky_texture);
 
 	mp_swap_chain->Present(true);
 }
 
 void AppWindow::Update()
 {
-	constant cc;
-	//cc.m_time = ::GetTickCount();
 	unsigned int time = ::GetTickCount();
 	m_delta_time = (time - m_prev_time) / 1000.0f;
 	m_prev_time = time;
-	
-	cc.m_world.SetIdentity();
 
+	UpdateCamera();
+	UpdateModel();
+	UpdateSkyBox();
+}
+
+void AppWindow::UpdateModel()
+{
+	constant cc;
+
+	Matrix4x4 light_rot_matrix;
+	light_rot_matrix.SetRotationY(m_light_rot_y);
+	m_light_rot_y += 0.707f * m_delta_time;
+
+
+	cc.m_world.SetIdentity();
+	cc.m_view = m_view_camera;
+	cc.m_proj = m_proj_camera;
+	cc.m_camera_position = m_world_camera.GetTranslation();
+	cc.m_light_direction = light_rot_matrix.GetZDirection();
+	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
+}
+
+void AppWindow::UpdateSkyBox()
+{
+	constant cc;
+	cc.m_world.SetIdentity();
+	cc.m_world.SetScale(Vector3d(100.0f, 100.0f, 100.0f));
+	cc.m_world.SetTranslation(m_world_camera.GetTranslation());
+	cc.m_view = m_view_camera;
+	cc.m_proj = m_proj_camera;
+	mp_sky_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
+}
+
+void AppWindow::UpdateCamera()
+{
 	Matrix4x4 camera_matrix, temp;
 
 	camera_matrix.SetRotationX(m_rot_x);
@@ -131,30 +166,36 @@ void AppWindow::Update()
 	temp.SetRotationY(m_rot_y);
 	camera_matrix *= temp;
 
-	Vector3d new_camera_pos = m_camera_matrix.GetTranslation() + camera_matrix.GetZDirection() * m_forward*0.01f;
-	new_camera_pos = new_camera_pos + camera_matrix.GetXDirection() * m_rightward * 0.01f;
+	Vector3d new_camera_pos = m_world_camera.GetTranslation() + camera_matrix.GetZDirection() * m_forward * 0.1f;
+	new_camera_pos = new_camera_pos + camera_matrix.GetXDirection() * m_rightward * 0.1f;
 	camera_matrix.SetTranslation(new_camera_pos);
-	cc.m_camera_position = new_camera_pos;
 
-	m_camera_matrix = camera_matrix;
-	
+	m_world_camera = camera_matrix;
+
 	camera_matrix.Inverse();
-	cc.m_view = camera_matrix;
-
-	Matrix4x4 light_rot_matrix;
-	light_rot_matrix.SetRotationY(m_light_rot_y);
-
-	m_light_rot_y += 0.707f * m_delta_time;
-
-
-	cc.m_light_direction = light_rot_matrix.GetZDirection();
+	m_view_camera = camera_matrix;
 
 	RECT rc = GetClientWindowRect();
 	int width = rc.right - rc.left;
 	int height = rc.bottom - rc.top;
-//	cc.m_proj.SetOrthoLH(width/300.0f, height/300.0f, -4.0f, 4.0f);
-	cc.m_proj.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
-	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
+	//	m_proj_camera.SetOrthoLH(width/300.0f, height/300.0f, -4.0f, 4.0f);
+	m_proj_camera.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
+}
+
+void AppWindow::DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, const TexturePtr& texture)
+{
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferVS(cb);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferPS(cb);
+
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetTexturePS(texture);
+
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(vs);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(ps);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mesh->GetVertexBuffer());
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mesh->GetIndexBuffer());
+
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->DrawIndexedTriangleList((UINT)mesh->GetIndexBuffer()->GetListSize(), 0, 0);
+
 }
 
 void AppWindow::OnKeyDown(byte key)

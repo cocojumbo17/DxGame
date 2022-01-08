@@ -15,10 +15,13 @@ public:
 	bool CompileVertexShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size);
 	bool CompilePixelShader(const wchar_t* shader_file, const char* entry_point_name, void** pp_shader_bytecode, size_t& shader_size);
 	void ReleaseCompiledShader();
+	void SetRasterizerState(bool is_cull_front);
 
 
 	DeviceContextPtr GetDeviceContext();
 
+protected:
+	void InitRasterizerState();
 private:
 	RenderSystem();
 protected:
@@ -29,6 +32,8 @@ protected:
 	IDXGIFactory* mp_dx_factory;
 	ID3D11DeviceContext* mp_imm_ctx;
 	ID3DBlob* mp_blob;
+	ID3D11RasterizerState* mp_front_rasterizer_state;
+	ID3D11RasterizerState* mp_back_rasterizer_state;
 
 	friend class SwapChain;
 	friend class VertexBuffer;
