@@ -32,6 +32,8 @@ struct constant
 	Matrix4x4 m_proj;
 	Vector4d m_light_direction;
 	Vector4d m_camera_position;
+	Vector4d m_light_position = Vector4d(0,2,0,0);
+	float m_light_radius = 4.0f;
 	float m_time;
 };
 
@@ -43,6 +45,7 @@ AppWindow::AppWindow()
 	, m_rightward(0.0f)
 	, m_light_rot_y(0.0f)
 	, m_is_fullscreen_state(false)
+	, m_light_radius(4.0f)
 {
 	Logger::PrintLog("AppWindow::AppWindow");
 }
@@ -57,13 +60,10 @@ void AppWindow::OnCreate()
 	Logger::PrintLog("AppWindow::OnCreate");
 
 
-	mp_earth_color_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_color.jpg");
-	mp_earth_spec_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_spec.jpg");
-	mp_earth_night_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_night.jpg");
-	mp_clouds_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\clouds.jpg");
+	mp_wall_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\wall.jpg");
 	mp_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\stars_map.jpg");
 
-	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere_hq.obj");
+	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\scene.obj");
 	mp_sky_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere.obj");
 
 	RECT rc = GetClientWindowRect();
@@ -78,13 +78,13 @@ void AppWindow::OnCreate()
 
 	void* p_shader_bytecode = nullptr;
 	size_t shader_size = 0;
-	if (GraphicsEngine::Instance()->GetRenderSystem()->CompileVertexShader(L"VertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
+	if (GraphicsEngine::Instance()->GetRenderSystem()->CompileVertexShader(L"PointLightVertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
 	{
 		mp_vs = GraphicsEngine::Instance()->GetRenderSystem()->CreateVertexShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
 
-	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"PixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
+	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"PointLightPixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
 	{
 		mp_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
@@ -95,7 +95,7 @@ void AppWindow::OnCreate()
 		mp_sky_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
-	m_world_camera.SetTranslation(Vector3d(0, 0, -2));
+	m_world_camera.SetTranslation(Vector3d(0, 2, -2));
 }
 
 void AppWindow::OnDestroy()
@@ -122,10 +122,7 @@ void AppWindow::Render()
 	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(false);
 	TexturePtr textures[] =
 	{
-		mp_earth_color_texture,
-		mp_earth_spec_texture,
-		mp_earth_night_texture,
-		mp_clouds_texture
+		mp_wall_texture
 	};
 	DrawMesh(mp_mesh, mp_vs, mp_ps, mp_cb, textures, ARRAYSIZE(textures));
 	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(true);
@@ -161,6 +158,9 @@ void AppWindow::UpdateModel()
 	cc.m_camera_position = m_world_camera.GetTranslation();
 	cc.m_light_direction = light_rot_matrix.GetZDirection();
 	cc.m_time = m_time;
+	float distance_to_origin = 2.0f;
+	cc.m_light_position = Vector4d(cos(2*m_light_rot_y) * distance_to_origin, 2.0f, sin(2*m_light_rot_y) * distance_to_origin, 1.0f);
+	cc.m_light_radius = m_light_radius;
 	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
 }
 
@@ -231,6 +231,12 @@ void AppWindow::OnKeyDown(byte key)
 			break;
 		case 'W':
 			m_forward = 1.0f;
+			break;
+		case 'O':
+			m_light_radius -= m_delta_time;
+			break;
+		case 'P':
+			m_light_radius += m_delta_time;
 			break;
 	}
 }

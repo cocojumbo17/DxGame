@@ -8,7 +8,7 @@ struct VS_OUTPUT {
 	float4 pos : SV_POSITION;
 	float2 texcoord : TEXCOORD0;
 	float3 normal : NORMAL0;
-	float3 direction_to_camera : TEXCOORD1;
+	float3 world_pos : TEXCOORD1;
 };
 
 

@@ -47,10 +47,7 @@ protected:
     PixelShaderPtr mp_ps;
     PixelShaderPtr mp_sky_ps;
 
-    TexturePtr mp_earth_color_texture;
-    TexturePtr mp_earth_spec_texture;
-    TexturePtr mp_earth_night_texture;
-    TexturePtr mp_clouds_texture;
+    TexturePtr mp_wall_texture;
     TexturePtr mp_sky_texture;
 
     MeshPtr mp_mesh;
@@ -67,6 +64,7 @@ protected:
     float m_scale;
     float m_forward;
     float m_rightward;
+    float m_light_radius;
     
     Matrix4x4 m_world_camera;
     Matrix4x4 m_view_camera;
