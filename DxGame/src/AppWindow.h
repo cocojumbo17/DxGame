@@ -17,7 +17,8 @@ protected:
     void UpdateCamera();
     void UpdateModel();
     void UpdateSkyBox();
-    void DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, const TexturePtr& texture);
+    void DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, 
+        const TexturePtr* textures, size_t num_textures);
 
     // Inherited via Window
     virtual void OnCreate() override;
@@ -46,7 +47,10 @@ protected:
     PixelShaderPtr mp_ps;
     PixelShaderPtr mp_sky_ps;
 
-    TexturePtr mp_wood_texture;
+    TexturePtr mp_earth_color_texture;
+    TexturePtr mp_earth_spec_texture;
+    TexturePtr mp_earth_night_texture;
+    TexturePtr mp_clouds_texture;
     TexturePtr mp_sky_texture;
 
     MeshPtr mp_mesh;
@@ -54,6 +58,7 @@ protected:
 
     unsigned int m_prev_time;
     float m_delta_time;
+    float m_time;
     float m_rot_x;
     float m_rot_y;
     float m_light_rot_y;

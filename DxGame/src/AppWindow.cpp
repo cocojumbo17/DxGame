@@ -30,10 +30,9 @@ struct constant
 	Matrix4x4 m_world;
 	Matrix4x4 m_view;
 	Matrix4x4 m_proj;
-	unsigned int temp;
-	unsigned int pad[3];
 	Vector4d m_light_direction;
 	Vector4d m_camera_position;
+	float m_time;
 };
 
 AppWindow::AppWindow()
@@ -58,10 +57,13 @@ void AppWindow::OnCreate()
 	Logger::PrintLog("AppWindow::OnCreate");
 
 
-	mp_wood_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\brick.png");
-	mp_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\sky.jpg");
+	mp_earth_color_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_color.jpg");
+	mp_earth_spec_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_spec.jpg");
+	mp_earth_night_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_night.jpg");
+	mp_clouds_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\clouds.jpg");
+	mp_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\stars_map.jpg");
 
-	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\suzanne.obj");
+	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere_hq.obj");
 	mp_sky_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere.obj");
 
 	RECT rc = GetClientWindowRect();
@@ -93,6 +95,7 @@ void AppWindow::OnCreate()
 		mp_sky_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
 	}
 	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
+	m_world_camera.SetTranslation(Vector3d(0, 0, -2));
 }
 
 void AppWindow::OnDestroy()
@@ -117,9 +120,17 @@ void AppWindow::Render()
 	Update();
 
 	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(false);
-	DrawMesh(mp_mesh, mp_vs, mp_ps, mp_cb, mp_wood_texture);
+	TexturePtr textures[] =
+	{
+		mp_earth_color_texture,
+		mp_earth_spec_texture,
+		mp_earth_night_texture,
+		mp_clouds_texture
+	};
+	DrawMesh(mp_mesh, mp_vs, mp_ps, mp_cb, textures, ARRAYSIZE(textures));
 	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(true);
-	DrawMesh(mp_sky_mesh, mp_vs, mp_sky_ps, mp_sky_cb, mp_sky_texture);
+	textures[0] = mp_sky_texture;
+	DrawMesh(mp_sky_mesh, mp_vs, mp_sky_ps, mp_sky_cb, textures, 1);
 
 	mp_swap_chain->Present(true);
 }
@@ -141,14 +152,15 @@ void AppWindow::UpdateModel()
 
 	Matrix4x4 light_rot_matrix;
 	light_rot_matrix.SetRotationY(m_light_rot_y);
-	m_light_rot_y += 0.707f * m_delta_time;
-
+	m_light_rot_y += 0.307f * m_delta_time;
+	m_time += m_delta_time;
 
 	cc.m_world.SetIdentity();
 	cc.m_view = m_view_camera;
 	cc.m_proj = m_proj_camera;
 	cc.m_camera_position = m_world_camera.GetTranslation();
 	cc.m_light_direction = light_rot_matrix.GetZDirection();
+	cc.m_time = m_time;
 	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
 }
 
@@ -188,12 +200,13 @@ void AppWindow::UpdateCamera()
 	m_proj_camera.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
 }
 
-void AppWindow::DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, const TexturePtr& texture)
+void AppWindow::DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, 
+	const TexturePtr* textures, size_t num_textures)
 {
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferVS(cb);
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferPS(cb);
 
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetTexturePS(texture);
+	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetTexturePS(textures, num_textures);
 
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(vs);
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(ps);

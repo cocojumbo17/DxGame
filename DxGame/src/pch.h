@@ -5,5 +5,6 @@
 #define SAFE_RELEASE(X) if (X) X->Release(); X=nullptr;
 #define MAX_NAME_STRING 256
 #include <string>
+#include <sstream>
 #include "Time.h"
 #include "Logger.h"

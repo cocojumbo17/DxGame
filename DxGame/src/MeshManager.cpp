@@ -24,8 +24,9 @@ Resource* MeshManager::CreateResourceFromConcreteFile(const wchar_t* file_name)
 	{
 		tex = new Mesh(file_name);
 	}
-	catch (const std::exception&)
+	catch (const std::exception& e)
 	{
+		Logger::PrintLog("[ERROR] %s", e.what());
 		throw;
 	}
 	return tex;

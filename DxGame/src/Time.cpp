@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Time.h"
 #include <time.h>
-#include <sstream>
 #include <iomanip>
 
 namespace Time

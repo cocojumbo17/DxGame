@@ -27,13 +27,20 @@ Mesh::Mesh(const wchar_t* full_path)
 	bool res = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
 	if (!res)
 	{
-		throw(std::exception("tinyobj::LoadObj returns false"));
+		std::stringstream ss;
+		ss << "tinyobj::LoadObj of " << filename << " returns false.";
+		throw(std::exception(ss.str().c_str()));
 	}
 	if (!err.empty())
 	{
+		std::stringstream ss;
+		ss << "tinyobj::LoadObj of " << filename << " returns error: \"" << err << "\".";
 		throw(std::exception("tinyobj::LoadObj returns error"));
 	}
-
+	if (!warn.empty())
+	{
+		Logger::PrintLog("[WARNING] During loading mesh of %s there is a warning:\"%s\"", filename.c_str(), warn.c_str());
+	}
 
 	std::vector<VertexMesh> vertices;
 	std::vector<unsigned int> indices;

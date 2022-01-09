@@ -11,8 +11,8 @@ public:
 	void SetIndexBuffer(const IndexBufferPtr& p_index_buffer);
 	void SetConstantBufferVS(const ConstantBufferPtr& p_constant_buffer);
 	void SetConstantBufferPS(const ConstantBufferPtr& p_constant_buffer);
-	//void SetTextureVS(const TexturePtr& p_texture);
-	void SetTexturePS(const TexturePtr& p_texture);
+	//void SetTextureVS(const TexturePtr* p_textures, size_t num_textures);
+	void SetTexturePS(const TexturePtr* p_textures, size_t num_textures);
 	void SetVertexShader(const VertexShaderPtr& p_vertex_shader);
 	void SetPixelShader(const PixelShaderPtr& p_pixel_shader);
 	void DrawTriangleList(UINT vertex_number, UINT start_vertex_index);

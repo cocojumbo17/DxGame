@@ -24,8 +24,9 @@ Resource* TextureManager::CreateResourceFromConcreteFile(const wchar_t* file_nam
 	{
 		tex = new Texture(file_name);
 	}
-	catch (const std::exception&)
+	catch (const std::exception& e)
 	{
+		Logger::PrintLog("[ERROR] %s", e.what());
 		throw;
 	}
 	return tex;
