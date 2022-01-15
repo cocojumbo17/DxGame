@@ -12,6 +12,10 @@ public:
 	TextureManager* GetTextureManager();
 	MeshManager* GetMeshManager();
 	void GetVertexMeshLayoutBytecodeAndSize(void** pp_bypecode, size_t& size);
+
+	MaterialPtr CreateMaterial(const wchar_t* vertex_shader_path, const wchar_t* pixel_shader_path);
+	MaterialPtr CreateMaterial(const MaterialPtr& material);
+	void SetMaterial(const MaterialPtr& material);
 private:
 	GraphicsEngine();
 	virtual ~GraphicsEngine();
