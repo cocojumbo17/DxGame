@@ -18,6 +18,8 @@
 #include "TextureManager.h"
 #include "MeshManager.h"
 #include "Mesh.h"
+#include "Material.h"
+
 struct vertex
 {
 	Vector3d pos;
@@ -60,11 +62,11 @@ void AppWindow::OnCreate()
 	Logger::PrintLog("AppWindow::OnCreate");
 
 
-	mp_wall_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\wall.jpg");
-	mp_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\stars_map.jpg");
-
-	mp_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\scene.obj");
+	mp_earth_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere_hq.obj");
+	mp_torus_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\torus.obj");
+	mp_suzanne_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\suzanne.obj");
 	mp_sky_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\sphere.obj");
+	mp_plane_mesh = GraphicsEngine::Instance()->GetMeshManager()->CreateMeshFromFile(L"assets\\meshes\\plane.obj");
 
 	RECT rc = GetClientWindowRect();
 	mp_swap_chain = GraphicsEngine::Instance()->GetRenderSystem()->CreateSwapChain(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
@@ -72,29 +74,28 @@ void AppWindow::OnCreate()
 
 	m_world_camera.SetTranslation(Vector3d(0, 0, -1.0f));
 
-	constant cc;
-	mp_cb = GraphicsEngine::Instance()->GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(cc));
-	mp_sky_cb = GraphicsEngine::Instance()->GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(cc));
 
-	void* p_shader_bytecode = nullptr;
-	size_t shader_size = 0;
-	if (GraphicsEngine::Instance()->GetRenderSystem()->CompileVertexShader(L"PointLightVertexShader.hlsl", "vsmain", &p_shader_bytecode, shader_size))
-	{
-		mp_vs = GraphicsEngine::Instance()->GetRenderSystem()->CreateVertexShader(p_shader_bytecode, shader_size);
-	}
-	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
+	TexturePtr p_wall_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\wall.jpg");
+	TexturePtr p_brick_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\brick.png");
+	TexturePtr p_earth_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\earth_color.jpg");
+	TexturePtr p_sky_texture = GraphicsEngine::Instance()->GetTextureManager()->CreateTextureFromFile(L"assets\\textures\\stars_map.jpg");
 
-	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"PointLightPixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
-	{
-		mp_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
-	}
-	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
-	
-	if (GraphicsEngine::Instance()->GetRenderSystem()->CompilePixelShader(L"SkyBoxPixelShader.hlsl", "psmain", &p_shader_bytecode, shader_size))
-	{
-		mp_sky_ps = GraphicsEngine::Instance()->GetRenderSystem()->CreatePixelShader(p_shader_bytecode, shader_size);
-	}
-	GraphicsEngine::Instance()->GetRenderSystem()->ReleaseCompiledShader();
+	mp_earth_mat = GraphicsEngine::Instance()->CreateMaterial(L"PointLightVertexShader.hlsl", L"PointLightPixelShader.hlsl");
+	mp_earth_mat->AddTexture(p_earth_texture);
+	mp_earth_mat->SetCullMode(CULL_MODE_BACK);
+
+	mp_brick_mat = GraphicsEngine::Instance()->CreateMaterial(mp_earth_mat);
+	mp_brick_mat->AddTexture(p_brick_texture);
+
+	mp_stone_mat = GraphicsEngine::Instance()->CreateMaterial(mp_earth_mat);
+	mp_stone_mat->AddTexture(p_wall_texture);
+
+	mp_sky_mat = GraphicsEngine::Instance()->CreateMaterial(L"PointLightVertexShader.hlsl", L"SkyBoxPixelShader.hlsl");
+	mp_sky_mat->AddTexture(p_sky_texture);
+	mp_sky_mat->SetCullMode(CULL_MODE_FRONT);
+
+
+
 	m_world_camera.SetTranslation(Vector3d(0, 2, -2));
 }
 
@@ -119,15 +120,22 @@ void AppWindow::Render()
 
 	Update();
 
-	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(false);
-	TexturePtr textures[] =
+	for (int i = 0; i < 3; ++i)
 	{
-		mp_wall_texture
-	};
-	DrawMesh(mp_mesh, mp_vs, mp_ps, mp_cb, textures, ARRAYSIZE(textures));
-	GraphicsEngine::Instance()->GetRenderSystem()->SetRasterizerState(true);
-	textures[0] = mp_sky_texture;
-	DrawMesh(mp_sky_mesh, mp_vs, mp_sky_ps, mp_sky_cb, textures, 1);
+		UpdateModel(Vector3d(0, 0, i * 4.0f - 4.0f), mp_stone_mat);
+		DrawMesh(mp_torus_mesh, mp_stone_mat);
+
+		UpdateModel(Vector3d(4, 0, i * 4.0f - 4.0f), mp_earth_mat);
+		DrawMesh(mp_earth_mesh, mp_earth_mat);
+
+		UpdateModel(Vector3d(-4, 0, i * 4.0f - 4.0f), mp_brick_mat);
+		DrawMesh(mp_suzanne_mesh, mp_brick_mat);
+	}
+
+	UpdateModel(Vector3d(0, -2.0f, 0), mp_stone_mat);
+	DrawMesh(mp_plane_mesh, mp_stone_mat);
+
+	DrawMesh(mp_sky_mesh, mp_sky_mat);
 
 	mp_swap_chain->Present(true);
 }
@@ -139,29 +147,35 @@ void AppWindow::Update()
 	m_prev_time = time;
 
 	UpdateCamera();
-	UpdateModel();
+	UpdateLight();
 	UpdateSkyBox();
 }
 
-void AppWindow::UpdateModel()
+void AppWindow::UpdateLight()
+{
+	m_light_rot_y += 0.707f * m_delta_time;
+	float distance_to_origin = 2.0f;
+	m_light_position = Vector4d(cos(2 * m_light_rot_y) * distance_to_origin, 2.0f, sin(2 * m_light_rot_y) * distance_to_origin, 1.0f);
+}
+
+void AppWindow::UpdateModel(Vector3d pos, MaterialPtr p_mat)
 {
 	constant cc;
 
 	Matrix4x4 light_rot_matrix;
 	light_rot_matrix.SetRotationY(m_light_rot_y);
-	m_light_rot_y += 0.307f * m_delta_time;
 	m_time += m_delta_time;
 
 	cc.m_world.SetIdentity();
+	cc.m_world.SetTranslation(pos);
 	cc.m_view = m_view_camera;
 	cc.m_proj = m_proj_camera;
 	cc.m_camera_position = m_world_camera.GetTranslation();
 	cc.m_light_direction = light_rot_matrix.GetZDirection();
 	cc.m_time = m_time;
-	float distance_to_origin = 2.0f;
-	cc.m_light_position = Vector4d(cos(2*m_light_rot_y) * distance_to_origin, 2.0f, sin(2*m_light_rot_y) * distance_to_origin, 1.0f);
+	cc.m_light_position = m_light_position;
 	cc.m_light_radius = m_light_radius;
-	mp_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
+	p_mat->SetData(&cc, sizeof(cc));
 }
 
 void AppWindow::UpdateSkyBox()
@@ -172,7 +186,7 @@ void AppWindow::UpdateSkyBox()
 	cc.m_world.SetTranslation(m_world_camera.GetTranslation());
 	cc.m_view = m_view_camera;
 	cc.m_proj = m_proj_camera;
-	mp_sky_cb->Update(GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext(), &cc);
+	mp_sky_mat->SetData(&cc, sizeof(cc));
 }
 
 void AppWindow::UpdateCamera()
@@ -200,16 +214,10 @@ void AppWindow::UpdateCamera()
 	m_proj_camera.SetPerspectiveFovLH(1.57f, (float)width / height, 0.1f, 100.0f);
 }
 
-void AppWindow::DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, 
-	const TexturePtr* textures, size_t num_textures)
+void AppWindow::DrawMesh(const MeshPtr& mesh, const MaterialPtr& p_mat)
 {
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferVS(cb);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetConstantBufferPS(cb);
+	GraphicsEngine::Instance()->SetMaterial(p_mat);
 
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetTexturePS(textures, num_textures);
-
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexShader(vs);
-	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetPixelShader(ps);
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetVertexBuffer(mesh->GetVertexBuffer());
 	GraphicsEngine::Instance()->GetRenderSystem()->GetDeviceContext()->SetIndexBuffer(mesh->GetIndexBuffer());
 

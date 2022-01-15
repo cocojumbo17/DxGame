@@ -3,6 +3,7 @@
 #include "IInputListener.h"
 #include "Matrix4x4.h"
 #include "Prerequisites.h"
+#include "Vector4d.h"
 
 class AppWindow :
     public Window,
@@ -15,10 +16,10 @@ protected:
     void Render();
     void Update();
     void UpdateCamera();
-    void UpdateModel();
+    void UpdateModel(Vector3d pos, MaterialPtr p_mat);
     void UpdateSkyBox();
-    void DrawMesh(const MeshPtr& mesh, const VertexShaderPtr& vs, const PixelShaderPtr& ps, const ConstantBufferPtr& cb, 
-        const TexturePtr* textures, size_t num_textures);
+    void UpdateLight();
+    void DrawMesh(const MeshPtr& mesh, const MaterialPtr& p_mat);
 
     // Inherited via Window
     virtual void OnCreate() override;
@@ -39,19 +40,18 @@ protected:
 
 protected:
     SwapChainPtr mp_swap_chain;
-    VertexShaderPtr mp_vs;
+    
+    MaterialPtr mp_earth_mat;
+    MaterialPtr mp_brick_mat;
+    MaterialPtr mp_stone_mat;
+    MaterialPtr mp_sky_mat;
 
-    ConstantBufferPtr mp_cb;
-    ConstantBufferPtr mp_sky_cb;
 
-    PixelShaderPtr mp_ps;
-    PixelShaderPtr mp_sky_ps;
-
-    TexturePtr mp_wall_texture;
-    TexturePtr mp_sky_texture;
-
-    MeshPtr mp_mesh;
+    MeshPtr mp_earth_mesh;
+    MeshPtr mp_torus_mesh;
+    MeshPtr mp_suzanne_mesh;
     MeshPtr mp_sky_mesh;
+    MeshPtr mp_plane_mesh;
 
     unsigned int m_prev_time;
     float m_delta_time;
@@ -71,5 +71,6 @@ protected:
     Matrix4x4 m_proj_camera;
 
     bool m_is_fullscreen_state;
+    Vector4d m_light_position;
 };
 
