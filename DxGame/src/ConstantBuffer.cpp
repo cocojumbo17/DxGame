@@ -9,7 +9,7 @@ ConstantBuffer::ConstantBuffer(RenderSystem* p_system, void* p_buffer, size_t bu
 , mp_system(p_system)
 {
     D3D11_BUFFER_DESC buf_desc = { 0 };
-    buf_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    buf_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     buf_desc.ByteWidth = (UINT)buffer_size;
     buf_desc.CPUAccessFlags = 0;
     buf_desc.MiscFlags = 0;
