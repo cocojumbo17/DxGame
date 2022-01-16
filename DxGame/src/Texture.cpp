@@ -38,7 +38,7 @@ Texture::Texture(const wchar_t* full_path)
 			desc2.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 			desc2.Filter = D3D11_FILTER_ANISOTROPIC;
 			desc2.MinLOD = 0;
-			desc2.MaxLOD = (UINT)image_data.GetMetadata().mipLevels;
+			desc2.MaxLOD = (float)image_data.GetMetadata().mipLevels;
 			hr = GraphicsEngine::Instance()->GetRenderSystem()->mp_d3d_device->CreateSamplerState(&desc2, &mp_sampler_state);
 			if (FAILED(hr))
 			{

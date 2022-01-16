@@ -16,10 +16,10 @@ protected:
     void Render();
     void Update();
     void UpdateCamera();
-    void UpdateModel(Vector3d pos, MaterialPtr p_mat);
+    void UpdateModel(Vector3d pos, const std::vector<MaterialPtr>& materials);
     void UpdateSkyBox();
     void UpdateLight();
-    void DrawMesh(const MeshPtr& mesh, const MaterialPtr& p_mat);
+    void DrawMesh(const MeshPtr& mesh, const std::vector<MaterialPtr>& materials);
 
     // Inherited via Window
     virtual void OnCreate() override;
@@ -41,17 +41,18 @@ protected:
 protected:
     SwapChainPtr mp_swap_chain;
     
-    MaterialPtr mp_earth_mat;
+    MaterialPtr mp_terrain_mat;
     MaterialPtr mp_brick_mat;
-    MaterialPtr mp_stone_mat;
+    MaterialPtr mp_window_mat;
+    MaterialPtr mp_wood_mat;
+    MaterialPtr mp_barrel_mat;
     MaterialPtr mp_sky_mat;
 
+    std::vector<MaterialPtr> m_mat_list;
 
-    MeshPtr mp_earth_mesh;
-    MeshPtr mp_torus_mesh;
-    MeshPtr mp_suzanne_mesh;
+    MeshPtr mp_terrain_mesh;
+    MeshPtr mp_scene_mesh;
     MeshPtr mp_sky_mesh;
-    MeshPtr mp_plane_mesh;
 
     unsigned int m_prev_time;
     float m_delta_time;

@@ -1,6 +1,5 @@
 #pragma once
 #include "Prerequisites.h"
-#include <vector>
 
 enum CULL_MODE
 {
