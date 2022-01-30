@@ -64,19 +64,31 @@
     <Filter Include="App\Shaders\EarthShader">
       <UniqueIdentifier>{a4d221b5-e36e-4d28-8221-5c5b7882f94b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App\Shaders\PointLightShader">
-      <UniqueIdentifier>{819c2b3f-317d-4c2c-adec-083028a73513}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameEngine\GraphicsEngine\Meterial">
       <UniqueIdentifier>{32a8bf96-f11c-49c7-b4c6-45f2de490582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Old">
+      <UniqueIdentifier>{cd9b55e8-88c3-43b9-8cc4-8df2b8103ff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\SpaceShooterGame">
+      <UniqueIdentifier>{f3e84328-b03c-4956-bd8e-890be8905c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\GlobalShaders">
+      <UniqueIdentifier>{1811d133-099b-49e1-8258-44bfe9039736}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\GlobalShaders\PointLightShaders">
+      <UniqueIdentifier>{819c2b3f-317d-4c2c-adec-083028a73513}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\GlobalShaders\DirectionalLightShaders">
+      <UniqueIdentifier>{036e4c99-f1a2-4ed9-96ac-eba6797864dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\GlobalShaders\SkyBoxShaders">
+      <UniqueIdentifier>{795eb1f7-fe73-411c-a829-ac0df4b46679}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\pch.cpp">
       <Filter>pch</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AppWindow.cpp">
-      <Filter>App</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>App</Filter>
@@ -159,13 +171,16 @@
     <ClCompile Include="src\Material.cpp">
       <Filter>GameEngine\GraphicsEngine\Meterial</Filter>
     </ClCompile>
+    <ClCompile Include="src\AppWindow.cpp">
+      <Filter>App\Old</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceShooterGame.cpp">
+      <Filter>App\SpaceShooterGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
       <Filter>pch</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AppWindow.h">
-      <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="src\Window.h">
       <Filter>GameEngine\WindowingSystem</Filter>
@@ -251,11 +266,14 @@
     <ClInclude Include="src\Material.h">
       <Filter>GameEngine\GraphicsEngine\Meterial</Filter>
     </ClInclude>
+    <ClInclude Include="src\AppWindow.h">
+      <Filter>App\Old</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpaceShooterGame.h">
+      <Filter>App\SpaceShooterGame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SkyBoxPixelShader.hlsl">
-      <Filter>App\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="VertexMeshLayoutShader.hlsl">
       <Filter>App\Shaders</Filter>
     </FxCompile>
@@ -266,10 +284,22 @@
       <Filter>App\Shaders\EarthShader</Filter>
     </FxCompile>
     <FxCompile Include="PointLightPixelShader.hlsl">
-      <Filter>App\Shaders\PointLightShader</Filter>
+      <Filter>App\GlobalShaders\PointLightShaders</Filter>
     </FxCompile>
     <FxCompile Include="PointLightVertexShader.hlsl">
-      <Filter>App\Shaders\PointLightShader</Filter>
+      <Filter>App\GlobalShaders\PointLightShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightPixelShader.hlsl">
+      <Filter>App\GlobalShaders\DirectionalLightShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightVertexShader.hlsl">
+      <Filter>App\GlobalShaders\DirectionalLightShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBoxPixelShader.hlsl">
+      <Filter>App\GlobalShaders\SkyBoxShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBoxVertexShader.hlsl">
+      <Filter>App\GlobalShaders\SkyBoxShaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

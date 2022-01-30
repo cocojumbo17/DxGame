@@ -50,7 +50,11 @@ RECT Window::GetClientWindowRect()
 {
 	RECT rc;
 	::GetClientRect(m_hwnd, &rc);
-	return rc;
+	POINT lt{ rc.left, rc.top };
+	POINT rb{ rc.right, rc.bottom };
+	::ClientToScreen(m_hwnd, &lt);
+	::ClientToScreen(m_hwnd, &rb);
+	return RECT{lt.x, lt.y, rb.x, rb.y};
 }
 
 void Window::GetScreenSize(int& w, int& h)

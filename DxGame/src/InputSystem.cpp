@@ -86,7 +86,7 @@ void InputSystem::MouseHandle()
 		{
 			for (auto l : m_listeners)
 			{
-				l->OnMouseMove(m_cur_mouse_pos - m_old_mouse_pos);
+				l->OnMouseMove(m_cur_mouse_pos);
 			}
 		}
 	}
@@ -106,7 +106,7 @@ void InputSystem::Update()
 
 void InputSystem::ShowCursor(bool is_show)
 {
-	::ShowCursor(is_show);
+	::ShowCursor(is_show == true);
 }
 
 void InputSystem::SetPosCursor(Point2d pos)

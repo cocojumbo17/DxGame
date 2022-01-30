@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "AppWindow.h"
+#include "SpaceShooterGame.h"
 #include "GraphicsEngine.h"
 #include "InputSystem.h"
 
@@ -20,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	{
 		try
 		{
-			AppWindow main_wnd;
+			SpaceShooterGame main_wnd;
 			while (main_wnd.IsRun());
 		}
 		catch (const std::exception&)
